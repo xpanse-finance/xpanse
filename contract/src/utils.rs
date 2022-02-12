@@ -1,6 +1,3 @@
-// Account
-pub const NEAR_MAIN_ACCOUNT: &str = "roti-sant.testnet";
-
 // Pools
 pub const DAI_ETH_POOL_ID: u32 = 193;
 pub const REF_ETH_POOL_ID: u32 = 321;
