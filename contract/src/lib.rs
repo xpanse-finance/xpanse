@@ -1,8 +1,8 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::LookupMap;
-use near_sdk::{env, near_bindgen, setup_alloc};
+use near_sdk::{env, near_bindgen, setup_alloc, PromiseResult};
 
-use crate::utils::claim_rewards;
+use crate::utils::{claim_rewards, withdraw_farm_rewards};
 
 mod utils;
 
@@ -24,12 +24,10 @@ impl Default for Welcome {
 
 #[near_bindgen]
 impl Welcome {
-    pub fn harvesting(&mut self) -> bool {
-        let mut harvesting_status = true;
-
+    pub fn harvesting(&mut self) {
         if env::signer_account_id() != env::current_account_id() {
             env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
-            return false;
+            return;
         }
 
         // Claim Rewards
@@ -38,6 +36,7 @@ impl Welcome {
 
         // Withdraw Rewards
         env::log(format!("SUCCESS! Starting Process Withdraw Rewards").as_bytes());
+        withdraw_farm_rewards();
 
         // Deposit Rewards into REF Wallet
         env::log(format!("SUCCESS! Starting Process Deposit Rewards into REF Wallet").as_bytes());
@@ -49,8 +48,23 @@ impl Welcome {
         env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
 
         env::log(format!("SUCCESS! Harvesting Complete").as_bytes());
-        return harvesting_status;
     }
+
+    // [#private]
+    // pub fn my_callback(&self, util_name: String) -> String {
+    //     assert_eq!(env::promise_results_count(), 1, "This is a callback method");
+    //     match env::promise_result(0) {
+    //         PromiseResult::NotReady => unreachable!(),
+    //         PromiseResult::Failed => "oops!".to_string(),
+    //         PromiseResult::Successful(result) => {
+    //             if util_name == "withdraw_rewards_callback".to_string(){
+
+    //             }
+    //             env::log(format!("SUCCESS! Harvesting Complete {}", result).as_bytes());
+    //             return "Success".to_string();
+    //         }
+    //     }
+    // }
 }
 
 /*
