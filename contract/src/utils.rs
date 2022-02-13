@@ -1,5 +1,8 @@
 use near_sdk::{env, ext_contract};
 
+// Seeds
+pub const STAKED_SEEDS: &str = "exchange.ref-dev.testnet@5";
+
 // Contracts
 pub const TOKEN1_CONTRACT_ID: &str = "paras.fakes.testnet";
 pub const TOKEN2_CONTRACT_ID: &str = "ref.fakes.testnet";
@@ -18,42 +21,11 @@ trait RefFarmingContract {
 }
 
 // Claim Rewards
-fn get_all_staked_seeds() -> Vec<String> {
-    let mut staked_seeds: Vec<String> = Vec::new();
-    // Do a cross-contract Call
-    env::log(format!("SUCCESS! Fetched all Staked Seeds").as_bytes());
-    return staked_seeds;
-}
-
-fn claim_using_seeds(seed_id: String) -> bool {
-    let mut harvesting_status = true;
-
-    if !harvesting_status {
-        env::log(format!("ERROR! Not all were successfull").as_bytes());
-    }
-
-    return harvesting_status;
-}
-
-pub fn claim_rewards() -> bool {
-    let mut harvesting_status = true;
-
+pub fn claim_rewards() {
     ext_ref_farming_contract::claim_reward_by_seed(
-        "exchange.ref-dev.testnet@5".to_string(),
+        STAKED_SEEDS.to_string(),
         &REF_FARMING_CONTRACT_ID,
         0,
         100_000_000_000_000,
     );
-
-    let staked_seeds: Vec<String> = get_all_staked_seeds();
-    if staked_seeds.len() == 0 {
-        env::log(format!("ERROR! Length of Staked Seeds is Zero").as_bytes());
-        return false;
-    }
-
-    for seed_id in staked_seeds {
-        harvesting_status = harvesting_status && claim_using_seeds(seed_id);
-    }
-
-    return harvesting_status;
 }

@@ -33,16 +33,22 @@ impl Welcome {
         }
 
         // Claim Rewards
-        harvesting_status = harvesting_status && claim_rewards();
+        env::log(format!("SUCCESS! Starting Process Claim Rewards").as_bytes());
+        claim_rewards();
 
         // Withdraw Rewards
+        env::log(format!("SUCCESS! Starting Process Withdraw Rewards").as_bytes());
 
         // Deposit Rewards into REF Wallet
+        env::log(format!("SUCCESS! Starting Process Deposit Rewards into REF Wallet").as_bytes());
 
         // Swap rewards for Pool Tokens
+        env::log(format!("SUCCESS! Starting Process Swap rewards for Pool Tokens").as_bytes());
 
         // Add Liquidity
+        env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
 
+        env::log(format!("SUCCESS! Harvesting Complete").as_bytes());
         return harvesting_status;
     }
 }
