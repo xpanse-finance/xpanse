@@ -1,9 +1,10 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::LookupMap;
-use near_sdk::{env, near_bindgen, setup_alloc, PromiseResult};
+use near_sdk::{env, near_bindgen, setup_alloc};
 
-use crate::utils::{claim_rewards, withdraw_farm_rewards};
+use crate::utils::{claim_rewards, deposit_rewards_into_ref_wallet, withdraw_farm_rewards};
 
+mod callbacks;
 mod utils;
 
 setup_alloc!();
@@ -40,6 +41,7 @@ impl Welcome {
 
         // Deposit Rewards into REF Wallet
         env::log(format!("SUCCESS! Starting Process Deposit Rewards into REF Wallet").as_bytes());
+        deposit_rewards_into_ref_wallet();
 
         // Swap rewards for Pool Tokens
         env::log(format!("SUCCESS! Starting Process Swap rewards for Pool Tokens").as_bytes());
@@ -50,16 +52,15 @@ impl Welcome {
         env::log(format!("SUCCESS! Harvesting Complete").as_bytes());
     }
 
-    // [#private]
-    // pub fn my_callback(&self, util_name: String) -> String {
+    // Callbacks
+    // #[private]
+    // pub fn generic_callback(&self, util_name: String) -> String {
     //     assert_eq!(env::promise_results_count(), 1, "This is a callback method");
     //     match env::promise_result(0) {
     //         PromiseResult::NotReady => unreachable!(),
     //         PromiseResult::Failed => "oops!".to_string(),
     //         PromiseResult::Successful(result) => {
-    //             if util_name == "withdraw_rewards_callback".to_string(){
-
-    //             }
+    //             if util_name == "withdraw_rewards_callback".to_string() {}
     //             env::log(format!("SUCCESS! Harvesting Complete {}", result).as_bytes());
     //             return "Success".to_string();
     //         }
