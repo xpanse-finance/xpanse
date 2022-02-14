@@ -13,15 +13,16 @@ impl Welcome {
             PromiseResult::Successful(result) => {
                 let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
                 env::log(format!("SUCCESS! Balance of {} = {:?}", reward_id, balance).as_bytes());
-                ext_ft::ft_transfer_call(
-                    REF_EXCHANGE_CONTRACT_ID.to_string(),
-                    balance,
-                    "".to_string(),
-                    &reward_id,
-                    YOCTO_NEAR_1,
-                    GAS_100,
-                );
-
+                if balance.0 != 0 {
+                    ext_ft::ft_transfer_call(
+                        REF_EXCHANGE_CONTRACT_ID.to_string(),
+                        balance,
+                        "".to_string(),
+                        &reward_id,
+                        YOCTO_NEAR_1,
+                        GAS_100,
+                    );
+                }
                 return "Success".to_string();
             }
         }
