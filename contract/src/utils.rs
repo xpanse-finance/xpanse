@@ -84,7 +84,7 @@ pub fn deposit_rewards_into_ref_wallet() {
             ext_self::deposit_rewards_into_ref_wallet_callback(
                 reward_id.to_string(),
                 &env::current_account_id(),
-                YOCTO_NEAR_1,
+                YOCTO_NEAR_0,
                 GAS_100,
             ),
         );
