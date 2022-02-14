@@ -9,6 +9,7 @@ pub const YOCTO_NEAR_1: u128 = 1;
 pub const GAS_5: u64 = 5_000_000_000_000;
 pub const GAS_40: u64 = 40_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
+pub const GAS_120: u64 = 120_000_000_000_000;
 pub const GAS_200: u64 = 200_000_000_000_000;
 pub const GAS_300: u64 = 300_000_000_000_000;
 
@@ -85,7 +86,7 @@ pub fn deposit_rewards_into_ref_wallet() {
                 reward_id.to_string(),
                 &env::current_account_id(),
                 YOCTO_NEAR_0,
-                GAS_200,
+                GAS_120,
             ),
         );
     }

@@ -25,7 +25,7 @@ impl Default for Welcome {
 
 #[near_bindgen]
 impl Welcome {
-    pub fn harvesting(&mut self) {
+    pub fn harvesting_step_1(&mut self) {
         if env::signer_account_id() != env::current_account_id() {
             env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
             return;
@@ -39,6 +39,15 @@ impl Welcome {
         env::log(format!("SUCCESS! Starting Process Withdraw Rewards").as_bytes());
         withdraw_farm_rewards();
 
+        env::log(format!("SUCCESS! Harvesting Step 1 Complete").as_bytes());
+    }
+
+    pub fn harvesting_step_2(&mut self) {
+        if env::signer_account_id() != env::current_account_id() {
+            env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
+            return;
+        }
+
         // Deposit Rewards into REF Wallet
         env::log(format!("SUCCESS! Starting Process Deposit Rewards into REF Wallet").as_bytes());
         deposit_rewards_into_ref_wallet();
@@ -49,7 +58,7 @@ impl Welcome {
         // Add Liquidity
         env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
 
-        env::log(format!("SUCCESS! Harvesting Complete").as_bytes());
+        env::log(format!("SUCCESS! Harvesting Step 2 Complete").as_bytes());
     }
 
     // Callbacks
