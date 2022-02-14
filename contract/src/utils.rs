@@ -85,7 +85,7 @@ pub fn deposit_rewards_into_ref_wallet() {
                 reward_id.to_string(),
                 &env::current_account_id(),
                 YOCTO_NEAR_0,
-                GAS_100,
+                GAS_200,
             ),
         );
     }
