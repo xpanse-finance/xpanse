@@ -11,7 +11,11 @@ pub const GAS_40: u64 = 40_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
 pub const GAS_120: u64 = 120_000_000_000_000;
 pub const GAS_200: u64 = 200_000_000_000_000;
+pub const GAS_250: u64 = 250_000_000_000_000;
 pub const GAS_300: u64 = 300_000_000_000_000;
+
+// Token Amount
+pub const TOKEN_100: u128 = 100;
 
 // Seeds
 pub const STAKED_SEEDS: &str = "exchange.ref-dev.testnet@5";
@@ -24,7 +28,7 @@ pub const REF_FARMING_CONTRACT_ID: &str = "farm110.ref-dev.testnet";
 pub const REF_EXCHANGE_CONTRACT_ID: &str = "exchange.ref-dev.testnet";
 
 // Pools ( -1 means no pool exist)
-pub const LIQUIDITY_POOL_ID: u32 = 5;
+pub const LIQUIDITY_POOL_ID: u64 = 5;
 pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [&i32; 2] = [&5, &6];
 pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [&i32; 2] = [&-1, &290];
 
@@ -35,6 +39,18 @@ trait RefFarmingContract {
     fn withdraw_reward(&mut self, token_id: String, amount: String);
 }
 
+#[ext_contract(ext_ref_exchange_contract)]
+trait RefExchangeContract {
+    fn get_return(
+        &self,
+        pool_id: u64,
+        token_in: String,
+        amount_in: String,
+        token_out: String,
+    ) -> U128;
+    fn get_deposit(&self, account_id: String, token_id: String) -> U128;
+}
+
 #[ext_contract(ext_ft)]
 pub trait FungibleToken {
     fn ft_balance_of(&mut self, account_id: AccountId) -> U128;
@@ -43,8 +59,8 @@ pub trait FungibleToken {
 
 #[ext_contract(ext_self)]
 pub trait MyContract {
-    // fn generic_callback(&self, util_name: String) -> String;
     fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String;
+    fn swap_rewards_for_pool_tokens_callback(&self) -> String;
 }
 
 // Claim Rewards
@@ -71,6 +87,7 @@ pub fn withdraw_farm_rewards() {
     }
 }
 
+// Deposit Rewards into REF Wallet
 pub fn deposit_rewards_into_ref_wallet() {
     for reward_id in REWARDS_CONTRACT_IDS {
         env::log(
@@ -90,4 +107,22 @@ pub fn deposit_rewards_into_ref_wallet() {
             ),
         );
     }
+}
+
+// Swap Rewards for Pool Tokens
+pub fn swap_rewards_for_pool_tokens() {
+    ext_ref_exchange_contract::get_return(
+        LIQUIDITY_POOL_ID,
+        TOKEN1_CONTRACT_ID.to_string(),
+        TOKEN_100.to_string(),
+        TOKEN2_CONTRACT_ID.to_string(),
+        &REF_EXCHANGE_CONTRACT_ID,
+        YOCTO_NEAR_0,
+        GAS_5,
+    )
+    .then(ext_self::swap_rewards_for_pool_tokens_callback(
+        &env::current_account_id(),
+        YOCTO_NEAR_0,
+        GAS_250,
+    ));
 }

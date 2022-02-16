@@ -2,7 +2,10 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::LookupMap;
 use near_sdk::{env, near_bindgen, setup_alloc};
 
-use crate::utils::{claim_rewards, deposit_rewards_into_ref_wallet, withdraw_farm_rewards};
+use crate::utils::{
+    claim_rewards, deposit_rewards_into_ref_wallet, swap_rewards_for_pool_tokens,
+    withdraw_farm_rewards,
+};
 
 mod callbacks;
 mod utils;
@@ -52,13 +55,23 @@ impl Welcome {
         env::log(format!("SUCCESS! Starting Process Deposit Rewards into REF Wallet").as_bytes());
         deposit_rewards_into_ref_wallet();
 
+        env::log(format!("SUCCESS! Harvesting Step 2 Complete").as_bytes());
+    }
+
+    pub fn harvesting_step_3(&mut self) {
+        if env::signer_account_id() != env::current_account_id() {
+            env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
+            return;
+        }
+
         // Swap rewards for Pool Tokens
         env::log(format!("SUCCESS! Starting Process Swap rewards for Pool Tokens").as_bytes());
+        swap_rewards_for_pool_tokens();
 
         // Add Liquidity
         env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
 
-        env::log(format!("SUCCESS! Harvesting Step 2 Complete").as_bytes());
+        env::log(format!("SUCCESS! Harvesting Step 3 Complete").as_bytes());
     }
 
     // Callbacks
