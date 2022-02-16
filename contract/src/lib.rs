@@ -4,22 +4,38 @@ use near_sdk::{env, near_bindgen, setup_alloc};
 
 setup_alloc!();
 
+// deposit
+// withdraw
+// harvest
+
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct Welcome {
-    records: LookupMap<String, String>,
+pub struct Strategy {
+    records: LookupMap<String, u128>, // Map of address -> shares in contract
+    total_supply: u128 // total supply of shares issued from the contract 
 }
 
-impl Default for Welcome {
+impl Default for Strategy {
     fn default() -> Self {
         Self {
             records: LookupMap::new(b"a".to_vec()),
+            total_supply: 0
         }
     }
 }
 
 #[near_bindgen]
-impl Welcome {
+impl Strategy {
+    /// Deposit mft tokens to strategy
+    /// use callback
+    pub fn deposit(&mut self, message: String) {
+        let account_id = env::signer_account_id();
+
+        // Use env::log to record logs permanently to the blockchain!
+        env::log(format!("Saving greeting '{}' for account '{}'", message, account_id,).as_bytes());
+
+        //self.records.insert(&account_id, &message);
+    }
     pub fn set_greeting(&mut self, message: String) {
         let account_id = env::signer_account_id();
 
@@ -83,7 +99,7 @@ mod tests {
     fn set_then_get_greeting() {
         let context = get_context(vec![], false);
         testing_env!(context);
-        let mut contract = Welcome::default();
+        let mut contract = Strategy::default();
         contract.set_greeting("howdy".to_string());
         assert_eq!(
             "howdy".to_string(),
@@ -95,7 +111,7 @@ mod tests {
     fn get_default_greeting() {
         let context = get_context(vec![], true);
         testing_env!(context);
-        let contract = Welcome::default();
+        let contract = Strategy::default();
         // this test did not call set_greeting so should return the default "Hello" greeting
         assert_eq!(
             "Hello".to_string(),

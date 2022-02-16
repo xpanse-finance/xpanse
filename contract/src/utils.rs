@@ -9,3 +9,5 @@ pub const REF_EXCHANGE_CONTRACT: &str = "exchange.ref-dev.testnet";
 pub const REF_TOKEN_CONTRACT: &str = "ref.fakes.testnet";
 pub const DAI_TOKEN_CONTRACT: &str = "dai.fakes.testnet";
 pub const ETH_TOKEN_CONTRACT: &str = "eth.fakes.testnet";
+
+pub const MFT_TAG: &str = "@";
