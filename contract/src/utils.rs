@@ -60,7 +60,7 @@ pub trait FungibleToken {
 #[ext_contract(ext_self)]
 pub trait MyContract {
     fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String;
-    fn swap_rewards_for_pool_tokens_callback(&self) -> String;
+    fn swap_rewards_for_pool_tokens_callback(&self, reward_id: String) -> String;
 }
 
 // Claim Rewards
@@ -111,18 +111,28 @@ pub fn deposit_rewards_into_ref_wallet() {
 
 // Swap Rewards for Pool Tokens
 pub fn swap_rewards_for_pool_tokens() {
-    ext_ref_exchange_contract::get_return(
-        LIQUIDITY_POOL_ID,
-        TOKEN1_CONTRACT_ID.to_string(),
-        TOKEN_100.to_string(),
-        TOKEN2_CONTRACT_ID.to_string(),
-        &REF_EXCHANGE_CONTRACT_ID,
-        YOCTO_NEAR_0,
-        GAS_5,
-    )
-    .then(ext_self::swap_rewards_for_pool_tokens_callback(
-        &env::current_account_id(),
-        YOCTO_NEAR_0,
-        GAS_250,
-    ));
+    for reward_id in REWARDS_CONTRACT_IDS {
+        ext_ref_exchange_contract::get_return(
+            LIQUIDITY_POOL_ID,
+            TOKEN1_CONTRACT_ID.to_string(),
+            TOKEN_100.to_string(),
+            TOKEN2_CONTRACT_ID.to_string(),
+            &REF_EXCHANGE_CONTRACT_ID,
+            YOCTO_NEAR_0,
+            GAS_5,
+        )
+        .and(ext_ref_exchange_contract::get_deposit(
+            env::current_account_id(),
+            reward_id.to_string(),
+            &REF_EXCHANGE_CONTRACT_ID,
+            YOCTO_NEAR_0,
+            GAS_5,
+        ))
+        .then(ext_self::swap_rewards_for_pool_tokens_callback(
+            reward_id.to_string(),
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            GAS_120,
+        ));
+    }
 }
