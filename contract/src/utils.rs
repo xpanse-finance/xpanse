@@ -1,4 +1,5 @@
 use near_sdk::json_types::U128;
+use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, ext_contract};
 
 // Yocto Near
@@ -8,6 +9,7 @@ pub const YOCTO_NEAR_1: u128 = 1;
 // Gas
 pub const GAS_5: u64 = 5_000_000_000_000;
 pub const GAS_40: u64 = 40_000_000_000_000;
+pub const GAS_50: u64 = 50_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
 pub const GAS_120: u64 = 120_000_000_000_000;
 pub const GAS_200: u64 = 200_000_000_000_000;
@@ -49,6 +51,7 @@ trait RefExchangeContract {
         token_out: String,
     ) -> U128;
     fn get_deposit(&self, account_id: String, token_id: String) -> U128;
+    fn swap(&mut self, actions: Vec<SwapAction>) -> U128;
 }
 
 #[ext_contract(ext_ft)]
@@ -61,6 +64,24 @@ pub trait FungibleToken {
 pub trait MyContract {
     fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String;
     fn swap_rewards_for_pool_tokens_callback(&self, reward_id: String) -> String;
+}
+
+// Copied from RefFinance Code
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct SwapAction {
+    /// Pool which should be used for swapping.
+    pub pool_id: u64,
+    /// Token to swap from.
+    pub token_in: String,
+    /// Amount to exchange.
+    /// If amount_in is None, it will take amount_out from previous step.
+    /// Will fail if amount_in is None on the first step.
+    pub amount_in: String,
+    /// Token to swap into.
+    pub token_out: String,
+    /// Required minimum amount of token_out.
+    pub min_amount_out: String,
 }
 
 // Claim Rewards

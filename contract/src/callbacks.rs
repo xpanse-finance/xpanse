@@ -1,4 +1,8 @@
-use crate::utils::{ext_ft, GAS_100, REF_EXCHANGE_CONTRACT_ID, TOKEN_100, YOCTO_NEAR_1};
+use crate::utils::{
+    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_50, REF_EXCHANGE_CONTRACT_ID,
+    REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID,
+    TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1,
+};
 use crate::*;
 use near_sdk::json_types::U128;
 use near_sdk::{env, near_bindgen, PromiseResult};
@@ -63,8 +67,8 @@ impl Welcome {
         let token_2_percentage: u128 = 100 - token_1_percentage;
 
         // Added Liquidity should be opposite
-        let required_token_1_percentage = 100 - token_1_percentage;
-        let required_token_2_percentage = 100 - token_2_percentage;
+        let required_token_1_percentage: u128 = 100 - token_1_percentage;
+        let required_token_2_percentage: u128 = 100 - token_2_percentage;
         env::log(
             format!(
                 "SUCCESS! Required Token 1 {} and Token 2 {} Percentage",
@@ -88,8 +92,9 @@ impl Welcome {
             .as_bytes(),
         );
 
-        let required_token_1_volume = (required_token_1_percentage * reward_amount_in_wallet) / 100;
-        let required_token_2_volume = reward_amount_in_wallet - required_token_1_volume;
+        let required_token_1_volume: u128 =
+            (required_token_1_percentage * reward_amount_in_wallet) / 100;
+        let required_token_2_volume: u128 = reward_amount_in_wallet - required_token_1_volume;
         env::log(
             format!(
                 "SUCCESS! Required Token 1 {} and Token 2 {} Volumes",
@@ -98,6 +103,46 @@ impl Welcome {
             .as_bytes(),
         );
 
+        let mut index: i32 = 0;
+        for temp_reward in REWARDS_CONTRACT_IDS {
+            if temp_reward == reward_id {
+                break;
+            }
+            index = index + 1;
+        }
+
+
+        if REWARDS_TOKEN1_SWAP_POOLS_ID[index.into()] != -1 {
+            let swap_details_1 = SwapAction {
+                pool_id: REWARDS_TOKEN1_SWAP_POOLS_ID[index.into()],
+                token_in: reward_id.clone(),
+                amount_in: required_token_1_volume.to_string(),
+                token_out: TOKEN1_CONTRACT_ID.to_string(),
+                min_amount_out: "0".to_string(),
+            };
+            ext_ref_exchange_contract::swap(
+                vec![swap_details_1],
+                &REF_EXCHANGE_CONTRACT_ID,
+                YOCTO_NEAR_0,
+                GAS_50,
+            );
+        }
+
+        if REWARDS_TOKEN2_SWAP_POOLS_ID[index.into()] != -1 {
+            let swap_details_2 = SwapAction {
+                pool_id: REWARDS_TOKEN2_SWAP_POOLS_ID[index.into()],
+                token_in: reward_id.clone(),
+                amount_in: required_token_2_volume.to_string(),
+                token_out: TOKEN2_CONTRACT_ID.to_string(),
+                min_amount_out: "0".to_string(),
+            };
+            ext_ref_exchange_contract::swap(
+                vec![swap_details_2],
+                &REF_EXCHANGE_CONTRACT_ID,
+                YOCTO_NEAR_0,
+                GAS_50,
+            );
+        }
         // swap_deposit_with_tokens(required_token_1_percentage, required_token_2_percentage);
         return "Success".to_string();
     }
