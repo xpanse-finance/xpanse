@@ -31,7 +31,11 @@ impl Welcome {
 
     #[private]
     pub fn swap_rewards_for_pool_tokens_callback(&self, reward_id: String) -> String {
-        assert_eq!(env::promise_results_count(), 1, "This is a callback method");
+        assert_eq!(
+            env::promise_results_count(),
+            2,
+            "Did not receive Equal Callbacks"
+        );
 
         let token_1_volume: u128 = TOKEN_100;
         let token_2_volume: u128 = match env::promise_result(0) {
