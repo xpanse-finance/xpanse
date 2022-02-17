@@ -59,7 +59,7 @@ impl Welcome {
             .as_bytes(),
         );
 
-        if token_2_volume < 5 {
+        if token_2_volume < 2 {
             env::log(format!("ERROR! Bad Ratio in Pool",).as_bytes());
             return "Error. Bad Ratio in Pool.".to_string();
         }
@@ -143,6 +143,60 @@ impl Welcome {
                 GAS_52,
             );
         }
+        return "Success".to_string();
+    }
+
+    #[private]
+    pub fn add_liquidity_util_callback(&self) -> String {
+        assert_eq!(
+            env::promise_results_count(),
+            3,
+            "Did not receive Equal Callbacks for add_liquidity_util_callback"
+        );
+
+        let token_1_volume: u128 = TOKEN_100;
+        let token_2_volume: u128 = match env::promise_result(0) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => env::panic(b"Unable to make comparison"),
+            PromiseResult::Successful(result) => near_sdk::serde_json::from_slice::<U128>(&result)
+                .unwrap()
+                .into(),
+        };
+
+        env::log(
+            format!(
+                "SUCCESS! If Token 1 = {} then Token 2 = {}",
+                token_1_volume, token_2_volume
+            )
+            .as_bytes(),
+        );
+
+        if token_2_volume < 2 {
+            env::log(format!("ERROR! Bad Ratio in Pool",).as_bytes());
+            return "Error. Bad Ratio in Pool.".to_string();
+        }
+
+        let token_1_amount_in_wallet: u128 = match env::promise_result(1) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => env::panic(b"Unable to make comparison"),
+            PromiseResult::Successful(result) => near_sdk::serde_json::from_slice::<U128>(&result)
+                .unwrap()
+                .into(),
+        };
+        let token_2_amount_in_wallet: u128 = match env::promise_result(2) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => env::panic(b"Unable to make comparison"),
+            PromiseResult::Successful(result) => near_sdk::serde_json::from_slice::<U128>(&result)
+                .unwrap()
+                .into(),
+        };
+        env::log(
+            format!(
+                "SUCCESS! Token 1 in wallet = {}, Token 2 in wallet = {}",
+                token_1_amount_in_wallet, token_2_amount_in_wallet
+            )
+            .as_bytes(),
+        );
         return "Success".to_string();
     }
 }

@@ -3,8 +3,8 @@ use near_sdk::collections::LookupMap;
 use near_sdk::{env, near_bindgen, setup_alloc};
 
 use crate::utils::{
-    claim_rewards, deposit_rewards_into_ref_wallet, swap_rewards_for_pool_tokens,
-    withdraw_farm_rewards,
+    add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet,
+    swap_rewards_for_pool_tokens, withdraw_farm_rewards,
 };
 
 mod callbacks;
@@ -74,20 +74,18 @@ impl Welcome {
         env::log(format!("SUCCESS! Harvesting Step 3 Complete").as_bytes());
     }
 
-    // Callbacks
-    // #[private]
-    // pub fn generic_callback(&self, util_name: String) -> String {
-    //     assert_eq!(env::promise_results_count(), 1, "This is a callback method");
-    //     match env::promise_result(0) {
-    //         PromiseResult::NotReady => unreachable!(),
-    //         PromiseResult::Failed => "oops!".to_string(),
-    //         PromiseResult::Successful(result) => {
-    //             if util_name == "withdraw_rewards_callback".to_string() {}
-    //             env::log(format!("SUCCESS! Harvesting Complete {}", result).as_bytes());
-    //             return "Success".to_string();
-    //         }
-    //     }
-    // }
+    pub fn harvesting_step_4(&mut self) {
+        if env::signer_account_id() != env::current_account_id() {
+            env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
+            return;
+        }
+
+        // Add Liquidity
+        env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
+        add_liquidity_util();
+
+        env::log(format!("SUCCESS! Harvesting Step 4 Complete").as_bytes());
+    }
 }
 
 /*

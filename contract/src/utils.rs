@@ -12,6 +12,7 @@ pub const GAS_40: u64 = 40_000_000_000_000;
 pub const GAS_52: u64 = 52_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
 pub const GAS_120: u64 = 120_000_000_000_000;
+pub const GAS_200: u64 = 200_000_000_000_000;
 
 // Token Amount
 pub const TOKEN_100: u128 = 100;
@@ -53,6 +54,7 @@ trait RefExchangeContract {
     ) -> U128;
     fn get_deposit(&self, account_id: String, token_id: String) -> U128;
     fn swap(&mut self, actions: Vec<SwapAction>) -> U128;
+    fn add_liquidity(&mut self, pool_id: u64, amounts: Vec<String>);
 }
 
 #[ext_contract(ext_ft)]
@@ -65,6 +67,7 @@ pub trait FungibleToken {
 pub trait MyContract {
     fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String;
     fn swap_rewards_for_pool_tokens_callback(&self, reward_id: String) -> String;
+    fn add_liquidity_util_callback(&self) -> String;
 }
 
 // Copied from RefFinance Code
@@ -157,4 +160,36 @@ pub fn swap_rewards_for_pool_tokens() {
             GAS_120,
         ));
     }
+}
+
+// Add Liquidity
+pub fn add_liquidity_util() {
+    ext_ref_exchange_contract::get_return(
+        LIQUIDITY_POOL_ID,
+        TOKEN1_CONTRACT_ID.to_string(),
+        TOKEN_100.to_string(),
+        TOKEN2_CONTRACT_ID.to_string(),
+        &REF_EXCHANGE_CONTRACT_ID,
+        YOCTO_NEAR_0,
+        GAS_5,
+    )
+    .and(ext_ref_exchange_contract::get_deposit(
+        env::current_account_id(),
+        TOKEN1_CONTRACT_ID.to_string(),
+        &REF_EXCHANGE_CONTRACT_ID,
+        YOCTO_NEAR_0,
+        GAS_5,
+    ))
+    .and(ext_ref_exchange_contract::get_deposit(
+        env::current_account_id(),
+        TOKEN2_CONTRACT_ID.to_string(),
+        &REF_EXCHANGE_CONTRACT_ID,
+        YOCTO_NEAR_0,
+        GAS_5,
+    ))
+    .then(ext_self::add_liquidity_util_callback(
+        &env::current_account_id(),
+        YOCTO_NEAR_0,
+        GAS_200,
+    ));
 }
