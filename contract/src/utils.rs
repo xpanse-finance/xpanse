@@ -9,10 +9,9 @@ pub const YOCTO_NEAR_1: u128 = 1;
 // Gas
 pub const GAS_5: u64 = 5_000_000_000_000;
 pub const GAS_40: u64 = 40_000_000_000_000;
-pub const GAS_55: u64 = 55_000_000_000_000;
+pub const GAS_52: u64 = 52_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
 pub const GAS_120: u64 = 120_000_000_000_000;
-pub const GAS_130: u64 = 130_000_000_000_000;
 
 // Token Amount
 pub const TOKEN_100: u128 = 100;
@@ -155,7 +154,7 @@ pub fn swap_rewards_for_pool_tokens() {
             reward_id.to_string(),
             &env::current_account_id(),
             YOCTO_NEAR_0,
-            GAS_130,
+            GAS_120,
         ));
     }
 }

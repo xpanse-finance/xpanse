@@ -1,5 +1,5 @@
 use crate::utils::{
-    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_55, REF_EXCHANGE_CONTRACT_ID,
+    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_52, REF_EXCHANGE_CONTRACT_ID,
     REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
     REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, TOKEN1_CONTRACT_ID,
     TOKEN2_CONTRACT_ID, TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1,
@@ -124,7 +124,7 @@ impl Welcome {
                 vec![swap_details_1],
                 &REF_EXCHANGE_CONTRACT_ID,
                 YOCTO_NEAR_0,
-                GAS_55,
+                GAS_52,
             );
         }
 
@@ -140,7 +140,7 @@ impl Welcome {
                 vec![swap_details_2],
                 &REF_EXCHANGE_CONTRACT_ID,
                 YOCTO_NEAR_0,
-                GAS_55,
+                GAS_52,
             );
         }
         return "Success".to_string();
