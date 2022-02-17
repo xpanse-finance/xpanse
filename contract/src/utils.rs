@@ -164,22 +164,13 @@ pub fn swap_rewards_for_pool_tokens() {
 
 // Add Liquidity
 pub fn add_liquidity_util() {
-    ext_ref_exchange_contract::get_return(
-        LIQUIDITY_POOL_ID,
-        TOKEN1_CONTRACT_ID.to_string(),
-        TOKEN_100.to_string(),
-        TOKEN2_CONTRACT_ID.to_string(),
-        &REF_EXCHANGE_CONTRACT_ID,
-        YOCTO_NEAR_0,
-        GAS_5,
-    )
-    .and(ext_ref_exchange_contract::get_deposit(
+    ext_ref_exchange_contract::get_deposit(
         env::current_account_id(),
         TOKEN1_CONTRACT_ID.to_string(),
         &REF_EXCHANGE_CONTRACT_ID,
         YOCTO_NEAR_0,
         GAS_5,
-    ))
+    )
     .and(ext_ref_exchange_contract::get_deposit(
         env::current_account_id(),
         TOKEN2_CONTRACT_ID.to_string(),
