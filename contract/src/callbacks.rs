@@ -1,8 +1,9 @@
 use crate::utils::{
-    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_52, REF_EXCHANGE_CONTRACT_ID,
-    REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
-    REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, TOKEN1_CONTRACT_ID,
-    TOKEN2_CONTRACT_ID, TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1,
+    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_52, LIQUIDITY_POOL_ID,
+    REF_EXCHANGE_CONTRACT_ID, REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID,
+    REWARDS_TOKEN1_SWAP_POOLS_ID_U64, REWARDS_TOKEN2_SWAP_POOLS_ID,
+    REWARDS_TOKEN2_SWAP_POOLS_ID_U64, TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100,
+    YOCTO_NEAR_0, YOCTO_NEAR_1,
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -154,6 +155,7 @@ impl Welcome {
             "Did not receive Equal Callbacks for add_liquidity_util_callback"
         );
 
+        // The Ratio/Get Return Code can be removed
         let token_1_volume: u128 = TOKEN_100;
         let token_2_volume: u128 = match env::promise_result(0) {
             PromiseResult::NotReady => unreachable!(),
@@ -196,6 +198,17 @@ impl Welcome {
                 token_1_amount_in_wallet, token_2_amount_in_wallet
             )
             .as_bytes(),
+        );
+
+        ext_ref_exchange_contract::add_liquidity(
+            LIQUIDITY_POOL_ID,
+            vec![
+                token_1_amount_in_wallet.to_string(),
+                token_2_amount_in_wallet.to_string(),
+            ],
+            &REF_EXCHANGE_CONTRACT_ID,
+            YOCTO_NEAR_1,
+            GAS_100,
         );
         return "Success".to_string();
     }
