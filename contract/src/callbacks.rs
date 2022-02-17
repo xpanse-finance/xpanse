@@ -177,16 +177,18 @@ impl Welcome {
             .as_bytes(),
         );
 
-        ext_ref_exchange_contract::add_liquidity(
-            LIQUIDITY_POOL_ID,
-            vec![
-                token_1_amount_in_wallet.to_string(),
-                token_2_amount_in_wallet.to_string(),
-            ],
-            &REF_EXCHANGE_CONTRACT_ID,
-            YOCTO_NEAR_1,
-            GAS_100,
-        );
+        if token_1_amount_in_wallet > 1000000000000 && token_2_amount_in_wallet > 1000000000000 {
+            ext_ref_exchange_contract::add_liquidity(
+                LIQUIDITY_POOL_ID,
+                vec![
+                    token_1_amount_in_wallet.to_string(),
+                    token_2_amount_in_wallet.to_string(),
+                ],
+                &REF_EXCHANGE_CONTRACT_ID,
+                YOCTO_NEAR_1,
+                GAS_100,
+            );
+        }
         return "Success".to_string();
     }
 }
