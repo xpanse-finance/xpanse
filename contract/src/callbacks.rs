@@ -1,7 +1,8 @@
 use crate::utils::{
-    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_50, REF_EXCHANGE_CONTRACT_ID,
-    REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID,
-    TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1,
+    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_55, REF_EXCHANGE_CONTRACT_ID,
+    REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
+    REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, TOKEN1_CONTRACT_ID,
+    TOKEN2_CONTRACT_ID, TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1,
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -103,7 +104,7 @@ impl Welcome {
             .as_bytes(),
         );
 
-        let mut index: i32 = 0;
+        let mut index = 0;
         for temp_reward in REWARDS_CONTRACT_IDS {
             if temp_reward == reward_id {
                 break;
@@ -111,10 +112,9 @@ impl Welcome {
             index = index + 1;
         }
 
-
-        if REWARDS_TOKEN1_SWAP_POOLS_ID[index.into()] != -1 {
+        if REWARDS_TOKEN1_SWAP_POOLS_ID[index] && required_token_1_volume != 0 {
             let swap_details_1 = SwapAction {
-                pool_id: REWARDS_TOKEN1_SWAP_POOLS_ID[index.into()],
+                pool_id: REWARDS_TOKEN1_SWAP_POOLS_ID_U64[index],
                 token_in: reward_id.clone(),
                 amount_in: required_token_1_volume.to_string(),
                 token_out: TOKEN1_CONTRACT_ID.to_string(),
@@ -124,13 +124,13 @@ impl Welcome {
                 vec![swap_details_1],
                 &REF_EXCHANGE_CONTRACT_ID,
                 YOCTO_NEAR_0,
-                GAS_50,
+                GAS_55,
             );
         }
 
-        if REWARDS_TOKEN2_SWAP_POOLS_ID[index.into()] != -1 {
+        if REWARDS_TOKEN2_SWAP_POOLS_ID[index] && required_token_2_volume != 0 {
             let swap_details_2 = SwapAction {
-                pool_id: REWARDS_TOKEN2_SWAP_POOLS_ID[index.into()],
+                pool_id: REWARDS_TOKEN2_SWAP_POOLS_ID_U64[index],
                 token_in: reward_id.clone(),
                 amount_in: required_token_2_volume.to_string(),
                 token_out: TOKEN2_CONTRACT_ID.to_string(),
@@ -140,10 +140,9 @@ impl Welcome {
                 vec![swap_details_2],
                 &REF_EXCHANGE_CONTRACT_ID,
                 YOCTO_NEAR_0,
-                GAS_50,
+                GAS_55,
             );
         }
-        // swap_deposit_with_tokens(required_token_1_percentage, required_token_2_percentage);
         return "Success".to_string();
     }
 }

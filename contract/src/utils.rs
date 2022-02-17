@@ -9,12 +9,10 @@ pub const YOCTO_NEAR_1: u128 = 1;
 // Gas
 pub const GAS_5: u64 = 5_000_000_000_000;
 pub const GAS_40: u64 = 40_000_000_000_000;
-pub const GAS_50: u64 = 50_000_000_000_000;
+pub const GAS_55: u64 = 55_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
 pub const GAS_120: u64 = 120_000_000_000_000;
-pub const GAS_200: u64 = 200_000_000_000_000;
-pub const GAS_250: u64 = 250_000_000_000_000;
-pub const GAS_300: u64 = 300_000_000_000_000;
+pub const GAS_130: u64 = 130_000_000_000_000;
 
 // Token Amount
 pub const TOKEN_100: u128 = 100;
@@ -29,10 +27,14 @@ pub const REWARDS_CONTRACT_IDS: [&str; 2] = ["ref.fakes.testnet", "pulse.fakes.t
 pub const REF_FARMING_CONTRACT_ID: &str = "farm110.ref-dev.testnet";
 pub const REF_EXCHANGE_CONTRACT_ID: &str = "exchange.ref-dev.testnet";
 
-// Pools ( -1 means no pool exist)
+// Pools ( False means no pool exist)
 pub const LIQUIDITY_POOL_ID: u64 = 5;
-pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [&i32; 2] = [&5, &6];
-pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [&i32; 2] = [&-1, &290];
+
+pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [bool; 2] = [true, true];
+pub const REWARDS_TOKEN1_SWAP_POOLS_ID_U64: [u64; 2] = [5, 6];
+
+pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [bool; 2] = [false, true];
+pub const REWARDS_TOKEN2_SWAP_POOLS_ID_U64: [u64; 2] = [0, 290];
 
 // Traits
 #[ext_contract(ext_ref_farming_contract)]
@@ -153,7 +155,7 @@ pub fn swap_rewards_for_pool_tokens() {
             reward_id.to_string(),
             &env::current_account_id(),
             YOCTO_NEAR_0,
-            GAS_120,
+            GAS_130,
         ));
     }
 }
