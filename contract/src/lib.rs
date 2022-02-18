@@ -35,11 +35,9 @@ impl Strategy {
     /// use callback
     pub fn deposit(&mut self, sender: AccountId, amount: u128) {
         let account_id = env::signer_account_id();
-
-        // Use env::log to record logs permanently to the blockchain!
-        env::log(format!("Saving greeting '{}' for account '{}'", amount, account_id,).as_bytes());
-
-        //self.records.insert(&account_id, &message);
+        
+    
+        env::log(format!("Deposited amount '{}' from '{}'", amount, account_id,).as_bytes());
     }
 
     pub fn harvesting_step_1(&mut self) {

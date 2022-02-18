@@ -1,4 +1,4 @@
-use near_sdk::json_types::U128;
+use near_sdk::json_types::{ValidAccountId, U128};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, ext_contract};
 
@@ -57,6 +57,17 @@ trait RefExchangeContract {
     fn get_deposit(&self, account_id: String, token_id: String) -> U128;
     fn swap(&mut self, actions: Vec<SwapAction>) -> U128;
     fn add_liquidity(&mut self, pool_id: u64, amounts: Vec<String>);
+
+    // MFT
+    fn mft_balance_of(&self, token_id: String, account_id: ValidAccountId) -> U128;
+    fn mft_transfer_call(
+        &mut self,
+        token_id: String,
+        receiver_id: ValidAccountId,
+        amount: U128,
+        memo: Option<String>,
+        msg: String,
+    ) -> PromiseOrValue<U128>;
 }
 
 #[ext_contract(ext_ft)]
