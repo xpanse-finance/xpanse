@@ -1,5 +1,5 @@
 [package]
-name = "greeter"
+name = "xpanse_core"
 version = "0.1.0"
 authors = ["Near Inc <hello@near.org>"]
 edition = "2018"
@@ -9,6 +9,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 near-sdk = "3.1.0"
+near-contract-standards = "3.1.0"
 
 [profile.release]
 codegen-units = 1

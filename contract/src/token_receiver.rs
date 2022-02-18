@@ -1,10 +1,7 @@
 use crate::*;
-use crate::errors::*;
-use near_sdk::PromiseOrValue;
+use near_sdk::{PromiseOrValue, AccountId};
 use near_sdk::json_types::{U128};
-use crate::utils::MFT_TAG;
-
-use near_contract_standards::fungible_token::receiver::FungibleTokenReceiver;
+use crate::utils::{MFT_TAG, STAKED_SEEDS};
 
 pub trait MFTTokenReceiver {
     fn mft_on_transfer(
@@ -61,14 +58,27 @@ impl MFTTokenReceiver for Strategy {
             }
             TokenOrPool::Token(_) => {
                 // for seed deposit, using mft to transfer 'root' token is not supported.
-                env::panic(ERR35_ILLEGAL_TOKEN_ID.as_bytes());
+                env::panic(format!(
+                    "ILLEGAL TOKEN ID"
+                )
+                .as_bytes());
             }
         }
 
-        // assert!(msg.is_empty(), "ERR_MSG_INCORRECT");
+        if seed_id != STAKED_SEEDS {
+            env::panic(
+                format!(
+                    "SEED IS WRONG!!"
+                )
+                .as_bytes()
+            )
+        }
 
-        // // if seed not exist, it will panic
-        // let amount: u128 = amount.into();
+        assert!(msg.is_empty(), "ERR_MSG_INCORRECT");
+
+        // if seed not exist, it will panic
+        let amount: u128 = amount.into();
+        self.deposit(sender_id.clone(), amount);
         // let seed_farm = self.get_seed(&seed_id);
         // if amount < seed_farm.get_ref().min_deposit {
         //     env::panic(
