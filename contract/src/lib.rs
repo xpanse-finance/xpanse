@@ -1,6 +1,6 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::LookupMap;
-use near_sdk::{env, near_bindgen, setup_alloc};
+use near_sdk::{env, near_bindgen, setup_alloc, AccountId};
 
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet,
@@ -9,25 +9,39 @@ use crate::utils::{
 
 mod callbacks;
 mod utils;
+mod token_receiver;
 
 setup_alloc!();
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct Welcome {
-    records: LookupMap<String, String>,
+pub struct Strategy {
+    records: LookupMap<String, u128>, // Map of address -> shares in contract
+    total_supply: u128 // total supply of shares issued from the contract 
 }
 
-impl Default for Welcome {
+impl Default for Strategy {
     fn default() -> Self {
         Self {
             records: LookupMap::new(b"a".to_vec()),
+            total_supply: 0
         }
     }
 }
 
 #[near_bindgen]
-impl Welcome {
+impl Strategy {
+    /// Deposit mft tokens to strategy
+    /// use callback
+    pub fn deposit(&mut self, sender: AccountId, amount: u128) {
+        let account_id = env::signer_account_id();
+
+        // Use env::log to record logs permanently to the blockchain!
+        env::log(format!("Saving greeting '{}' for account '{}'", amount, account_id,).as_bytes());
+
+        //self.records.insert(&account_id, &message);
+    }
+
     pub fn harvesting_step_1(&mut self) {
         if env::signer_account_id() != env::current_account_id() {
             env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());

@@ -2,6 +2,8 @@ use near_sdk::json_types::U128;
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, ext_contract};
 
+pub const MFT_TAG: &str = "@";
+
 // Yocto Near
 pub const YOCTO_NEAR_0: u128 = 0;
 pub const YOCTO_NEAR_1: u128 = 1;

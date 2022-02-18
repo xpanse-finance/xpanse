@@ -10,7 +10,7 @@ use near_sdk::json_types::U128;
 use near_sdk::{env, near_bindgen, PromiseResult};
 
 #[near_bindgen]
-impl Welcome {
+impl Strategy {
     #[private]
     pub fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String {
         assert_eq!(env::promise_results_count(), 1, "This is a callback method");
