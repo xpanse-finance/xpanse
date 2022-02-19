@@ -7,7 +7,7 @@ use std::convert::TryFrom;
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
     ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, GAS_10, GAS_250, STAKED_SEEDS,
-    YOCTO_NEAR_0,
+    YOCTO_NEAR_0, ext_ref_farming_contract
 };
 
 mod callbacks;
@@ -40,8 +40,7 @@ impl Strategy {
     /// use callback
     pub(crate) fn deposit(&mut self, sender: AccountId, amount: u128) {
         // exchange rate = balance of mft / total_supply
-        ext_ref_exchange_contract::mft_balance_of(
-            STAKED_SEEDS.to_string(),
+        ext_ref_farming_contract::list_user_seeds(
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
             &env::current_account_id(),
             YOCTO_NEAR_0,

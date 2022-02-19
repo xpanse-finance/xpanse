@@ -3,11 +3,12 @@ use crate::utils::{
     LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, REWARDS_CONTRACT_IDS,
     REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64, REWARDS_TOKEN2_SWAP_POOLS_ID,
     REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS, TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID,
-    TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1,
+    TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1, SeedId
 };
 use crate::*;
 use near_sdk::json_types::U128;
 use near_sdk::{env, near_bindgen, PromiseResult};
+use std::collections::HashMap;
 
 #[near_bindgen]
 impl Strategy {
@@ -18,7 +19,8 @@ impl Strategy {
             PromiseResult::NotReady => unreachable!(),
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(result) => {
-                let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
+                let seed_hash = near_sdk::serde_json::from_slice::<HashMap<SeedId, U128>>(&result).unwrap();
+                let balance: &U128 = seed_hash.get(STAKED_SEEDS).unwrap();
                 env::log(
                     format!(
                         "SUCCESS! Balance of {} = {:?}",
@@ -40,7 +42,7 @@ impl Strategy {
                 .then(ext_self::post_mft_transfer(
                     sender,
                     amount,
-                    balance,
+                    balance.clone(),
                     &env::current_account_id(),
                     YOCTO_NEAR_0,
                     GAS_100,
