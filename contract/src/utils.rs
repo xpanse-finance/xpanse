@@ -26,6 +26,8 @@ pub const TOKEN_100: u128 = 100;
 // Seeds
 pub const STAKED_SEEDS: &str = "exchange.ref-dev.testnet@5";
 
+pub const TOKEN_ID: &str = ":5";
+
 // Contracts
 pub const TOKEN1_CONTRACT_ID: &str = "paras.fakes.testnet";
 pub const TOKEN2_CONTRACT_ID: &str = "ref.fakes.testnet";

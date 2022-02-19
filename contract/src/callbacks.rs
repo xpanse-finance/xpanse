@@ -3,7 +3,7 @@ use crate::utils::{
     LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, REWARDS_CONTRACT_IDS,
     REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64, REWARDS_TOKEN2_SWAP_POOLS_ID,
     REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS, TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID,
-    TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1, SeedId, GAS_80
+    TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1, SeedId, GAS_80, TOKEN_ID
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -19,8 +19,10 @@ impl Strategy {
             PromiseResult::NotReady => unreachable!(),
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(result) => {
+                env::log(format!("Deposited amount entered! 1").as_bytes());
                 let seed_hash = near_sdk::serde_json::from_slice::<HashMap<SeedId, U128>>(&result).unwrap();
                 let bal = seed_hash.get(STAKED_SEEDS);
+                env::log(format!("Deposited amount entered! 23").as_bytes());
                 let mut balance: &U128 = &U128(0);
                 if bal != None {
                     balance = bal.unwrap();
@@ -33,19 +35,25 @@ impl Strategy {
                     )
                     .as_bytes(),
                 );
+
+                let val = self.records.get(&sender);
+                let mut res = 0;
+                if val != None {
+                    res = val.unwrap();
+                }
                 let bala = balance.clone();
                 if self.total_supply == 0 || bala == U128(0) {
                     let exchange_rate = 1;
                     let issue = exchange_rate * amount;
                     self.total_supply += issue;
                     self.records
-                        .insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                        .insert(&sender, &(res + issue));
                 } else {
                     let bal: u128 = bala.into();
                     let issue: u128 = (self.total_supply * amount) / bal;
                     self.total_supply += issue;
                     self.records
-                        .insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                        .insert(&sender, &(res + issue));
                 }
                 self.to_deposit += amount;
                 return "Success".to_string();
@@ -62,19 +70,19 @@ impl Strategy {
             PromiseResult::Successful(result) => {
                 let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
                  ext_ref_exchange_contract::mft_transfer_call(
-                    STAKED_SEEDS.to_string(),
+                    TOKEN_ID.to_string(),
                     ValidAccountId::try_from(REF_FARMING_CONTRACT_ID).unwrap(),
                     balance,
                     None,
                     "".to_string(),
-                    &env::current_account_id(),
+                    &REF_EXCHANGE_CONTRACT_ID,
                     YOCTO_NEAR_1,
-                    GAS_100,
+                    100_000_000_000_000,
                 )
                 .then(ext_self::post_mft_transfer(
                     &env::current_account_id(),
                     YOCTO_NEAR_0,
-                    GAS_100,
+                    90_000_000_000_000,
                 ));
                 env::log(
                     format!(
@@ -91,8 +99,8 @@ impl Strategy {
 
     #[private]
     pub fn post_mft_transfer(&mut self) -> String {
-        assert_eq!(env::promise_results_count(), 2, "This is a callback method");
-        match env::promise_result(1) {
+        assert_eq!(env::promise_results_count(), 1, "This is a callback method");
+        match env::promise_result(0) {
             PromiseResult::NotReady => unreachable!(),
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(_) => {

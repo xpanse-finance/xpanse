@@ -6,7 +6,7 @@ use std::convert::TryFrom;
 
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
-    ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, GAS_10, GAS_250, STAKED_SEEDS,
+    ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, GAS_5, GAS_10, GAS_250, STAKED_SEEDS,
     YOCTO_NEAR_0, ext_ref_farming_contract, GAS_160, REF_FARMING_CONTRACT_ID, REF_EXCHANGE_CONTRACT_ID
 };
 
@@ -42,6 +42,7 @@ impl Strategy {
     /// use callback
     pub(crate) fn deposit(&mut self, sender: AccountId, amount: u128) {
         // exchange rate = balance of mft / total_supply
+        env::log(format!("Deposited amount entered!").as_bytes());
         ext_ref_farming_contract::list_user_seeds(
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
             &REF_FARMING_CONTRACT_ID,
@@ -59,17 +60,19 @@ impl Strategy {
     }
 
     pub fn deposit_to_farm(&mut self) {
+        let x: u128 = env::prepaid_gas as u128;
+        env::log(format!("Deposited amount '{:?}'", x).as_bytes());
         ext_ref_exchange_contract::mft_balance_of(
-            ":5".to_string(),
+            TOKEN_ID.to_string(),
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
             &REF_EXCHANGE_CONTRACT_ID,
             YOCTO_NEAR_0,
-            GAS_10,
+            20_000_000_000_000,
         )
         .then(ext_self::internal_deposit_to_farm(
             &env::current_account_id(),
             YOCTO_NEAR_0,
-            GAS_250,
+            220_000_000_000_000,
         ));
     }
 
