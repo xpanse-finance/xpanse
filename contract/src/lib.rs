@@ -1,18 +1,18 @@
-use std::convert::TryFrom;
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::LookupMap;
+use near_sdk::json_types::{ValidAccountId, U128};
 use near_sdk::{env, near_bindgen, setup_alloc, AccountId};
-use near_sdk::json_types::{U128, ValidAccountId};
+use std::convert::TryFrom;
 
 use crate::utils::{
-    add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet,
-    swap_rewards_for_pool_tokens, withdraw_farm_rewards, STAKED_SEEDS,
-    ext_ref_exchange_contract, YOCTO_NEAR_0, GAS_120, GAS_200, ext_self
+    add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
+    ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, GAS_10, GAS_250, STAKED_SEEDS,
+    YOCTO_NEAR_0,
 };
 
 mod callbacks;
-mod utils;
 mod token_receiver;
+mod utils;
 
 setup_alloc!();
 
@@ -20,8 +20,8 @@ setup_alloc!();
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Strategy {
     records: LookupMap<String, u128>, // Map of address -> shares in contract
-    total_supply: u128, // total supply of shares issued from the contract
-    claim: LookupMap<String, u128>
+    total_supply: u128,               // total supply of shares issued from the contract
+    claim: LookupMap<String, u128>,
 }
 
 impl Default for Strategy {
@@ -29,7 +29,7 @@ impl Default for Strategy {
         Self {
             records: LookupMap::new(b"a".to_vec()),
             claim: LookupMap::new(b"aa".to_vec()),
-            total_supply: 0
+            total_supply: 0,
         }
     }
 }
@@ -45,26 +45,22 @@ impl Strategy {
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
             &env::current_account_id(),
             YOCTO_NEAR_0,
-            GAS_120,
-        ).then(
-            ext_self::internal_deposit(
-                sender.clone(),
-                amount,
-                &env::current_account_id(),
-                YOCTO_NEAR_0,
-                GAS_200,
-            )
-        );
+            GAS_10,
+        )
+        .then(ext_self::internal_deposit(
+            sender.clone(),
+            amount,
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            GAS_250,
+        ));
         env::log(format!("Deposited amount '{}' from '{}'", amount, sender).as_bytes());
     }
 
     pub fn withdraw(&mut self, amount: U128) {
         let sender = env::signer_account_id();
         if self.records.get(&sender).unwrap() < amount.into() {
-            env::panic(format!(
-                "Not enough balance!"
-            )
-            .as_bytes());
+            env::panic(format!("Not enough balance!").as_bytes());
         }
         // exchange rate = balance of mft / total_supply
         ext_ref_exchange_contract::mft_balance_of(
@@ -72,16 +68,15 @@ impl Strategy {
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
             &env::current_account_id(),
             YOCTO_NEAR_0,
-            GAS_120,
-        ).then(
-            ext_self::internal_withdraw(
-                sender.clone(),
-                amount.into(),
-                &env::current_account_id(),
-                YOCTO_NEAR_0,
-                GAS_200,
-            )
-        );
+            GAS_10,
+        )
+        .then(ext_self::internal_withdraw(
+            sender.clone(),
+            amount.into(),
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            GAS_250,
+        ));
         env::log(format!("Withdraw amount '{:?}' from '{:?}'", amount, sender).as_bytes());
     }
 

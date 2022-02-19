@@ -1,7 +1,7 @@
-use crate::*;
-use near_sdk::{PromiseOrValue, AccountId};
-use near_sdk::json_types::{U128};
 use crate::utils::{MFT_TAG, STAKED_SEEDS};
+use crate::*;
+use near_sdk::json_types::U128;
+use near_sdk::{AccountId, PromiseOrValue};
 
 pub trait MFTTokenReceiver {
     fn mft_on_transfer(
@@ -19,7 +19,7 @@ enum TokenOrPool {
 }
 
 /// a sub token would use a format ":<u64>"
-fn try_identify_sub_token_id(token_id: &String) ->Result<u64, &'static str> {
+fn try_identify_sub_token_id(token_id: &String) -> Result<u64, &'static str> {
     if token_id.starts_with(":") {
         if let Ok(pool_id) = str::parse::<u64>(&token_id[1..token_id.len()]) {
             Ok(pool_id)
@@ -58,20 +58,12 @@ impl MFTTokenReceiver for Strategy {
             }
             TokenOrPool::Token(_) => {
                 // for seed deposit, using mft to transfer 'root' token is not supported.
-                env::panic(format!(
-                    "ILLEGAL TOKEN ID"
-                )
-                .as_bytes());
+                env::panic(format!("ILLEGAL TOKEN ID").as_bytes());
             }
         }
 
         if seed_id != STAKED_SEEDS {
-            env::panic(
-                format!(
-                    "SEED IS WRONG!!"
-                )
-                .as_bytes()
-            )
+            env::panic(format!("SEED IS WRONG!!").as_bytes())
         }
 
         assert!(msg.is_empty(), "ERR_MSG_INCORRECT");
@@ -83,14 +75,14 @@ impl MFTTokenReceiver for Strategy {
         // if amount < seed_farm.get_ref().min_deposit {
         //     env::panic(
         //         format!(
-        //             "{} {}", 
-        //             ERR34_BELOW_MIN_SEED_DEPOSITED, 
+        //             "{} {}",
+        //             ERR34_BELOW_MIN_SEED_DEPOSITED,
         //             seed_farm.get_ref().min_deposit
         //         )
         //         .as_bytes()
         //     )
         // }
-        
+
         // self.internal_seed_deposit(&seed_id, &sender_id, amount, SeedType::MFT);
 
         // self.assert_storage_usage(&sender_id);

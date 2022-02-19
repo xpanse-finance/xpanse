@@ -1,9 +1,9 @@
 use crate::utils::{
-    ext_ft, ext_ref_exchange_contract, SwapAction, GAS_100, GAS_52, LIQUIDITY_POOL_ID,
-    REF_EXCHANGE_CONTRACT_ID, REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID,
-    REWARDS_TOKEN1_SWAP_POOLS_ID_U64, REWARDS_TOKEN2_SWAP_POOLS_ID,
-    REWARDS_TOKEN2_SWAP_POOLS_ID_U64, TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100,
-    YOCTO_NEAR_0, YOCTO_NEAR_1, STAKED_SEEDS, REF_FARMING_CONTRACT_ID, ext_ref_farming_contract
+    ext_ft, ext_ref_exchange_contract, ext_ref_farming_contract, SwapAction, GAS_100, GAS_52,
+    LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, REWARDS_CONTRACT_IDS,
+    REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64, REWARDS_TOKEN2_SWAP_POOLS_ID,
+    REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS, TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID,
+    TOKEN_100, YOCTO_NEAR_0, YOCTO_NEAR_1,
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -19,7 +19,14 @@ impl Strategy {
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(result) => {
                 let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
-                env::log(format!("SUCCESS! Balance of {} = {:?}", env::current_account_id(), balance).as_bytes());
+                env::log(
+                    format!(
+                        "SUCCESS! Balance of {} = {:?}",
+                        env::current_account_id(),
+                        balance
+                    )
+                    .as_bytes(),
+                );
                 ext_ref_exchange_contract::mft_transfer_call(
                     STAKED_SEEDS.to_string(),
                     ValidAccountId::try_from(REF_FARMING_CONTRACT_ID).unwrap(),
@@ -29,16 +36,15 @@ impl Strategy {
                     &env::current_account_id(),
                     YOCTO_NEAR_1,
                     GAS_100,
-                ).then(
-                    ext_self::post_mft_transfer(
-                        sender,
-                        amount,
-                        balance,
-                        &env::current_account_id(),
-                        YOCTO_NEAR_0,
-                        GAS_200,
-                    )
-                );
+                )
+                .then(ext_self::post_mft_transfer(
+                    sender,
+                    amount,
+                    balance,
+                    &env::current_account_id(),
+                    YOCTO_NEAR_0,
+                    GAS_100,
+                ));
                 return "Success".to_string();
             }
         }
@@ -55,12 +61,14 @@ impl Strategy {
                     let exchange_rate = 1;
                     let issue = exchange_rate * amount;
                     self.total_supply += issue;
-                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                    self.records
+                        .insert(&sender, &(self.records.get(&sender).unwrap() + issue));
                 } else {
                     let bal: u128 = balance.into();
                     let issue: u128 = (self.total_supply * amount) / bal;
                     self.total_supply += issue;
-                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                    self.records
+                        .insert(&sender, &(self.records.get(&sender).unwrap() + issue));
                 }
                 return "Success".to_string();
             }
@@ -75,7 +83,14 @@ impl Strategy {
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(result) => {
                 let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
-                env::log(format!("SUCCESS! Balance of {} = {:?}", env::current_account_id(), balance).as_bytes());
+                env::log(
+                    format!(
+                        "SUCCESS! Balance of {} = {:?}",
+                        env::current_account_id(),
+                        balance
+                    )
+                    .as_bytes(),
+                );
                 let bal: u128 = balance.into();
                 let issue: u128 = (bal * amount) / self.total_supply;
                 ext_ref_farming_contract::withdraw_seed(
@@ -84,16 +99,15 @@ impl Strategy {
                     &env::current_account_id(),
                     YOCTO_NEAR_1,
                     GAS_100,
-                ).then(
-                    ext_self::post_withdraw_seed(
-                        sender,
-                        amount,
-                        issue,
-                        &env::current_account_id(),
-                        YOCTO_NEAR_0,
-                        GAS_200,
-                    )
-                );
+                )
+                .then(ext_self::post_withdraw_seed(
+                    sender,
+                    amount,
+                    issue,
+                    &env::current_account_id(),
+                    YOCTO_NEAR_0,
+                    GAS_100,
+                ));
                 return "Success".to_string();
             }
         }
@@ -107,8 +121,10 @@ impl Strategy {
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(_) => {
                 self.total_supply -= amount;
-                self.records.insert(&sender, &(self.claim.get(&sender).unwrap() - amount));
-                self.claim.insert(&sender, &(self.claim.get(&sender).unwrap() + issue));
+                self.records
+                    .insert(&sender, &(self.claim.get(&sender).unwrap() - amount));
+                self.claim
+                    .insert(&sender, &(self.claim.get(&sender).unwrap() + issue));
                 return "Success".to_string();
             }
         }
