@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::LookupMap;
 use near_sdk::{env, near_bindgen, setup_alloc, AccountId};
@@ -5,7 +6,8 @@ use near_sdk::json_types::{U128, ValidAccountId};
 
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet,
-    swap_rewards_for_pool_tokens, withdraw_farm_rewards, STAKED_SEEDS, REF_EXCHANGE_CONTRACT_ID
+    swap_rewards_for_pool_tokens, withdraw_farm_rewards, STAKED_SEEDS,
+    ext_ref_exchange_contract, YOCTO_NEAR_0, GAS_120, GAS_200, ext_self
 };
 
 mod callbacks;
@@ -36,27 +38,20 @@ impl Strategy {
     /// use callback
     pub(crate) fn deposit(&mut self, sender: AccountId, amount: u128) {
         // exchange rate = balance of mft / total_supply
-        ext_ft::mft_balance_of(STAKED_SEEDS, env::current_account_id()).then(
+        ext_ref_exchange_contract::mft_balance_of(
+            STAKED_SEEDS.to_string(),
+            ValidAccountId::try_from(env::current_account_id()).unwrap(),
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            GAS_120,
+        ).then(
             ext_self::internal_deposit(
-                &env::current_account_id(),
+                env::current_account_id(),
                 amount,
+                &env::current_account_id(),
                 YOCTO_NEAR_0,
                 GAS_200,
             )
-        );
-        // issue = exchange_rate * amount;
-        // self.total_supply += issue;
-        // self.records.insert(&sender, self.records.get(&account_id) + issue)
-        // call to mft transfer
-        // confirm token id
-        ext_ref_exchange_contract::mft_transfer_call(
-            STAKED_SEEDS,
-            ValidAccountId::try_from(REF_FARMING_CONTRACT_ID).unwrap(),
-            U128(amount),
-            None,
-            "".to_string() // attach gas
-        ).then(
-
         );
         env::log(format!("Deposited amount '{}' from '{}'", amount, sender,).as_bytes());
     }

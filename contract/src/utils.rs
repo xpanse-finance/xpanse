@@ -85,6 +85,8 @@ pub trait MyContract {
     fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String;
     fn swap_rewards_for_pool_tokens_callback(&self, reward_id: String) -> String;
     fn add_liquidity_util_callback(&self) -> String;
+    fn internal_deposit(&mut self, sender: AccountId, amount: u128);
+    fn post_mft_transfer(&mut self, sender: AccountId, amount: u128, balance: U128);
 }
 
 // Copied from RefFinance Code

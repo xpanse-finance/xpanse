@@ -3,7 +3,7 @@ use crate::utils::{
     REF_EXCHANGE_CONTRACT_ID, REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID,
     REWARDS_TOKEN1_SWAP_POOLS_ID_U64, REWARDS_TOKEN2_SWAP_POOLS_ID,
     REWARDS_TOKEN2_SWAP_POOLS_ID_U64, TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100,
-    YOCTO_NEAR_0, YOCTO_NEAR_1,
+    YOCTO_NEAR_0, YOCTO_NEAR_1, STAKED_SEEDS, REF_FARMING_CONTRACT_ID
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -12,7 +12,7 @@ use near_sdk::{env, near_bindgen, PromiseResult};
 #[near_bindgen]
 impl Strategy {
     #[private]
-    pub fn internal_deposit(&mut self, sender: AccountId, amount: u128) {
+    pub fn internal_deposit(&mut self, sender: AccountId, amount: u128) -> String {
         assert_eq!(env::promise_results_count(), 1, "This is a callback method");
         match env::promise_result(0) {
             PromiseResult::NotReady => unreachable!(),
@@ -20,26 +20,51 @@ impl Strategy {
             PromiseResult::Successful(result) => {
                 let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
                 env::log(format!("SUCCESS! Balance of {} = {:?}", env::current_account_id(), balance).as_bytes());
-                if self.total_supply == 0 || balance == U128(0) {
-                    let exchange_rate = 1;
-                    let issue = exchange_rate * amount;
-                    self.total_supply += issue;
-                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
-                } else {
-                    let exchange_rate = balance / self.total_supply;
-                    let issue = exchange_rate * amount;
-                    self.total_supply += issue;
-                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
-                }
-                
+                ext_ref_exchange_contract::mft_transfer_call(
+                    STAKED_SEEDS.to_string(),
+                    ValidAccountId::try_from(REF_FARMING_CONTRACT_ID).unwrap(),
+                    U128(amount),
+                    None,
+                    "".to_string(),
+                    &env::current_account_id(),
+                    YOCTO_NEAR_1,
+                    GAS_100,
+                ).then(
+                    ext_self::post_mft_transfer(
+                        env::current_account_id(),
+                        amount,
+                        balance,
+                        &env::current_account_id(),
+                        YOCTO_NEAR_0,
+                        GAS_200,
+                    )
+                );
                 return "Success".to_string();
             }
         }
     }
 
     #[private]
-    pb fn mft_transfer_callback(&mut self, sender: AccountId, amount: u128, balance: u128) {
-        
+    pub fn post_mft_transfer(&mut self, sender: AccountId, amount: u128, balance: U128) -> String {
+        assert_eq!(env::promise_results_count(), 2, "This is a callback method");
+        match env::promise_result(0) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => "oops!".to_string(),
+            PromiseResult::Successful(result) => {
+                if self.total_supply == 0 || balance == U128(0) {
+                    let exchange_rate = 1;
+                    let issue = exchange_rate * amount;
+                    self.total_supply += issue;
+                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                } else {
+                    let bal: u128 = balance.into();
+                    let issue: u128 = (bal * amount) / self.total_supply;
+                    self.total_supply += issue;
+                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                }
+                return "Success".to_string();
+            }
+        }
     }
 
     #[private]
