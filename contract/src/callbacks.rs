@@ -12,6 +12,37 @@ use near_sdk::{env, near_bindgen, PromiseResult};
 #[near_bindgen]
 impl Strategy {
     #[private]
+    pub fn internal_deposit(&mut self, sender: AccountId, amount: u128) {
+        assert_eq!(env::promise_results_count(), 1, "This is a callback method");
+        match env::promise_result(0) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => "oops!".to_string(),
+            PromiseResult::Successful(result) => {
+                let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
+                env::log(format!("SUCCESS! Balance of {} = {:?}", env::current_account_id(), balance).as_bytes());
+                if self.total_supply == 0 || balance == U128(0) {
+                    let exchange_rate = 1;
+                    let issue = exchange_rate * amount;
+                    self.total_supply += issue;
+                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                } else {
+                    let exchange_rate = balance / self.total_supply;
+                    let issue = exchange_rate * amount;
+                    self.total_supply += issue;
+                    self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
+                }
+                
+                return "Success".to_string();
+            }
+        }
+    }
+
+    #[private]
+    pb fn mft_transfer_callback(&mut self, sender: AccountId, amount: u128, balance: u128) {
+        
+    }
+
+    #[private]
     pub fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String {
         assert_eq!(env::promise_results_count(), 1, "This is a callback method");
         match env::promise_result(0) {

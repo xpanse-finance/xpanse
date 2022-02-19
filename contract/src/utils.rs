@@ -38,11 +38,15 @@ pub const REWARDS_TOKEN1_SWAP_POOLS_ID_U64: [u64; 2] = [5, 6];
 pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [bool; 2] = [false, true];
 pub const REWARDS_TOKEN2_SWAP_POOLS_ID_U64: [u64; 2] = [0, 290];
 
+pub(crate) type SeedId = String;
 // Traits
 #[ext_contract(ext_ref_farming_contract)]
 trait RefFarmingContract {
     fn claim_reward_by_seed(&mut self, seed_id: String);
     fn withdraw_reward(&mut self, token_id: String, amount: String);
+
+    fn withdraw_seed(&mut self, seed_id: SeedId, amount: U128);
+    fn list_user_seeds(&self, account_id: ValidAccountId) -> HashMap<SeedId, U128>;
 }
 
 #[ext_contract(ext_ref_exchange_contract)]
