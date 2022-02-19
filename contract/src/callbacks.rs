@@ -47,7 +47,7 @@ impl Strategy {
     #[private]
     pub fn post_mft_transfer(&mut self, sender: AccountId, amount: u128, balance: U128) -> String {
         assert_eq!(env::promise_results_count(), 2, "This is a callback method");
-        match env::promise_result(0) {
+        match env::promise_result(1) {
             PromiseResult::NotReady => unreachable!(),
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(_) => {
@@ -88,6 +88,7 @@ impl Strategy {
                     ext_self::post_withdraw_seed(
                         sender,
                         amount,
+                        issue,
                         &env::current_account_id(),
                         YOCTO_NEAR_0,
                         GAS_200,
@@ -99,13 +100,15 @@ impl Strategy {
     }
 
     #[private]
-    pub fn post_withdraw_seed(&mut self, sender: AccountId, amount: u128) -> String {
+    pub fn post_withdraw_seed(&mut self, sender: AccountId, amount: u128, issue: u128) -> String {
         assert_eq!(env::promise_results_count(), 2, "This is a callback method");
-        match env::promise_result(0) {
+        match env::promise_result(1) {
             PromiseResult::NotReady => unreachable!(),
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(_) => {
-                
+                self.total_supply -= amount;
+                self.records.insert(&sender, &(self.claim.get(&sender).unwrap() - amount));
+                self.claim.insert(&sender, &(self.claim.get(&sender).unwrap() + issue));
                 return "Success".to_string();
             }
         }

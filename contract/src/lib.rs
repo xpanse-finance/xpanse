@@ -20,13 +20,15 @@ setup_alloc!();
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Strategy {
     records: LookupMap<String, u128>, // Map of address -> shares in contract
-    total_supply: u128 // total supply of shares issued from the contract 
+    total_supply: u128, // total supply of shares issued from the contract
+    claim: LookupMap<String, u128>
 }
 
 impl Default for Strategy {
     fn default() -> Self {
         Self {
             records: LookupMap::new(b"a".to_vec()),
+            claim: LookupMap::new(b"aa".to_vec()),
             total_supply: 0
         }
     }
@@ -58,6 +60,12 @@ impl Strategy {
 
     pub fn withdraw(&mut self, amount: U128) {
         let sender = env::signer_account_id();
+        if self.records.get(&sender).unwrap() < amount.into() {
+            env::panic(format!(
+                "Not enough balance!"
+            )
+            .as_bytes());
+        }
         // exchange rate = balance of mft / total_supply
         ext_ref_exchange_contract::mft_balance_of(
             STAKED_SEEDS.to_string(),
