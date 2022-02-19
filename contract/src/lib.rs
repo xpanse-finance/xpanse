@@ -46,18 +46,35 @@ impl Strategy {
             GAS_120,
         ).then(
             ext_self::internal_deposit(
-                env::current_account_id(),
+                sender.clone(),
                 amount,
                 &env::current_account_id(),
                 YOCTO_NEAR_0,
                 GAS_200,
             )
         );
-        env::log(format!("Deposited amount '{}' from '{}'", amount, sender,).as_bytes());
+        env::log(format!("Deposited amount '{}' from '{}'", amount, sender).as_bytes());
     }
 
     pub fn withdraw(&mut self, amount: U128) {
-
+        let sender = env::signer_account_id();
+        // exchange rate = balance of mft / total_supply
+        ext_ref_exchange_contract::mft_balance_of(
+            STAKED_SEEDS.to_string(),
+            ValidAccountId::try_from(env::current_account_id()).unwrap(),
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            GAS_120,
+        ).then(
+            ext_self::internal_withdraw(
+                sender.clone(),
+                amount.into(),
+                &env::current_account_id(),
+                YOCTO_NEAR_0,
+                GAS_200,
+            )
+        );
+        env::log(format!("Withdraw amount '{:?}' from '{:?}'", amount, sender).as_bytes());
     }
 
     pub fn harvesting_step_1(&mut self) {

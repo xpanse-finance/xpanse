@@ -87,6 +87,8 @@ pub trait MyContract {
     fn add_liquidity_util_callback(&self) -> String;
     fn internal_deposit(&mut self, sender: AccountId, amount: u128);
     fn post_mft_transfer(&mut self, sender: AccountId, amount: u128, balance: U128);
+    fn internal_withdraw(&mut self, sender: AccountId, amount: u128);
+    fn post_withdraw_seed(&mut self, sender: AccountId, amount: u128);
 }
 
 // Copied from RefFinance Code

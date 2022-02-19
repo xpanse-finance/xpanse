@@ -3,7 +3,7 @@ use crate::utils::{
     REF_EXCHANGE_CONTRACT_ID, REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID,
     REWARDS_TOKEN1_SWAP_POOLS_ID_U64, REWARDS_TOKEN2_SWAP_POOLS_ID,
     REWARDS_TOKEN2_SWAP_POOLS_ID_U64, TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100,
-    YOCTO_NEAR_0, YOCTO_NEAR_1, STAKED_SEEDS, REF_FARMING_CONTRACT_ID
+    YOCTO_NEAR_0, YOCTO_NEAR_1, STAKED_SEEDS, REF_FARMING_CONTRACT_ID, ext_ref_farming_contract
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -31,7 +31,7 @@ impl Strategy {
                     GAS_100,
                 ).then(
                     ext_self::post_mft_transfer(
-                        env::current_account_id(),
+                        sender,
                         amount,
                         balance,
                         &env::current_account_id(),
@@ -50,7 +50,7 @@ impl Strategy {
         match env::promise_result(0) {
             PromiseResult::NotReady => unreachable!(),
             PromiseResult::Failed => "oops!".to_string(),
-            PromiseResult::Successful(result) => {
+            PromiseResult::Successful(_) => {
                 if self.total_supply == 0 || balance == U128(0) {
                     let exchange_rate = 1;
                     let issue = exchange_rate * amount;
@@ -58,10 +58,54 @@ impl Strategy {
                     self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
                 } else {
                     let bal: u128 = balance.into();
-                    let issue: u128 = (bal * amount) / self.total_supply;
+                    let issue: u128 = (self.total_supply * amount) / bal;
                     self.total_supply += issue;
                     self.records.insert(&sender, &(self.records.get(&sender).unwrap() + issue));
                 }
+                return "Success".to_string();
+            }
+        }
+    }
+
+    #[private]
+    pub fn internal_withdraw(&mut self, sender: AccountId, amount: u128) -> String {
+        assert_eq!(env::promise_results_count(), 1, "This is a callback method");
+        match env::promise_result(0) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => "oops!".to_string(),
+            PromiseResult::Successful(result) => {
+                let balance = near_sdk::serde_json::from_slice::<U128>(&result).unwrap();
+                env::log(format!("SUCCESS! Balance of {} = {:?}", env::current_account_id(), balance).as_bytes());
+                let bal: u128 = balance.into();
+                let issue: u128 = (bal * amount) / self.total_supply;
+                ext_ref_farming_contract::withdraw_seed(
+                    STAKED_SEEDS.to_string(),
+                    U128(issue),
+                    &env::current_account_id(),
+                    YOCTO_NEAR_1,
+                    GAS_100,
+                ).then(
+                    ext_self::post_withdraw_seed(
+                        sender,
+                        amount,
+                        &env::current_account_id(),
+                        YOCTO_NEAR_0,
+                        GAS_200,
+                    )
+                );
+                return "Success".to_string();
+            }
+        }
+    }
+
+    #[private]
+    pub fn post_withdraw_seed(&mut self, sender: AccountId, amount: u128) -> String {
+        assert_eq!(env::promise_results_count(), 2, "This is a callback method");
+        match env::promise_result(0) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => "oops!".to_string(),
+            PromiseResult::Successful(_) => {
+                
                 return "Success".to_string();
             }
         }
