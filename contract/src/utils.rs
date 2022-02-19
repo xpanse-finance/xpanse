@@ -13,8 +13,10 @@ pub const GAS_5: u64 = 5_000_000_000_000;
 pub const GAS_10: u64 = 10_000_000_000_000;
 pub const GAS_40: u64 = 40_000_000_000_000;
 pub const GAS_52: u64 = 52_000_000_000_000;
+pub const GAS_80: u64 = 80_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
 pub const GAS_120: u64 = 120_000_000_000_000;
+pub const GAS_160: u64 = 160_000_000_000_000;
 pub const GAS_200: u64 = 200_000_000_000_000;
 pub const GAS_250: u64 = 250_000_000_000_000;
 
@@ -83,14 +85,15 @@ pub trait FungibleToken {
 }
 
 #[ext_contract(ext_self)]
-pub trait MyContract {
+pub trait Strategy {
     fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String;
     fn swap_rewards_for_pool_tokens_callback(&self, reward_id: String) -> String;
     fn add_liquidity_util_callback(&self) -> String;
     fn internal_deposit(&mut self, sender: AccountId, amount: u128);
-    fn post_mft_transfer(&mut self, sender: AccountId, amount: u128, balance: U128);
+    fn post_mft_transfer(&mut self) -> String;
     fn internal_withdraw(&mut self, sender: AccountId, amount: u128);
     fn post_withdraw_seed(&mut self, sender: AccountId, amount: u128, issue: u128);
+    fn internal_deposit_to_farm(&mut self) -> String;
 }
 
 // Copied from RefFinance Code

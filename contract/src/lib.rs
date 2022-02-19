@@ -7,7 +7,7 @@ use std::convert::TryFrom;
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
     ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, GAS_10, GAS_250, STAKED_SEEDS,
-    YOCTO_NEAR_0, ext_ref_farming_contract
+    YOCTO_NEAR_0, ext_ref_farming_contract, GAS_160, REF_FARMING_CONTRACT_ID, REF_EXCHANGE_CONTRACT_ID
 };
 
 mod callbacks;
@@ -22,6 +22,7 @@ pub struct Strategy {
     records: LookupMap<String, u128>, // Map of address -> shares in contract
     total_supply: u128,               // total supply of shares issued from the contract
     claim: LookupMap<String, u128>,
+    to_deposit: u128
 }
 
 impl Default for Strategy {
@@ -30,6 +31,7 @@ impl Default for Strategy {
             records: LookupMap::new(b"a".to_vec()),
             claim: LookupMap::new(b"aa".to_vec()),
             total_supply: 0,
+            to_deposit: 0,
         }
     }
 }
@@ -42,7 +44,7 @@ impl Strategy {
         // exchange rate = balance of mft / total_supply
         ext_ref_farming_contract::list_user_seeds(
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
-            &env::current_account_id(),
+            &REF_FARMING_CONTRACT_ID,
             YOCTO_NEAR_0,
             GAS_10,
         )
@@ -51,9 +53,24 @@ impl Strategy {
             amount,
             &env::current_account_id(),
             YOCTO_NEAR_0,
-            GAS_250,
+            GAS_160,
         ));
         env::log(format!("Deposited amount '{}' from '{}'", amount, sender).as_bytes());
+    }
+
+    pub fn deposit_to_farm(&mut self) {
+        ext_ref_exchange_contract::mft_balance_of(
+            ":5".to_string(),
+            ValidAccountId::try_from(env::current_account_id()).unwrap(),
+            &REF_EXCHANGE_CONTRACT_ID,
+            YOCTO_NEAR_0,
+            GAS_10,
+        )
+        .then(ext_self::internal_deposit_to_farm(
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            GAS_250,
+        ));
     }
 
     pub fn withdraw(&mut self, amount: U128) {
