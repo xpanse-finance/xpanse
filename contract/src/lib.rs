@@ -6,7 +6,7 @@ use std::convert::TryFrom;
 
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
-    ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, GAS_5, GAS_10, GAS_250, STAKED_SEEDS,
+    ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, TOKEN_ID, GAS_10, GAS_250, STAKED_SEEDS,
     YOCTO_NEAR_0, ext_ref_farming_contract, GAS_160, REF_FARMING_CONTRACT_ID, REF_EXCHANGE_CONTRACT_ID
 };
 
