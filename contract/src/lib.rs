@@ -7,7 +7,7 @@ use std::convert::TryFrom;
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
     ext_ref_farming_contract, ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards,
-    GAS_10, GAS_100, GAS_160, GAS_250, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, TOKEN_ID,
+    GAS_10, GAS_100, GAS_160, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, TOKEN_ID,
     YOCTO_NEAR_0, YOCTO_NEAR_1,
 };
 
@@ -94,7 +94,7 @@ impl Strategy {
             amount.into(),
             &env::current_account_id(),
             YOCTO_NEAR_0,
-            GAS_250,
+            260_000_000_000_000,
         ));
         env::log(format!("Withdraw amount '{:?}' from '{:?}'", amount, sender).as_bytes());
     }
@@ -108,12 +108,11 @@ impl Strategy {
         }
 
         if res > 0 {
-            ext_ref_exchange_contract::mft_transfer_call(
+            ext_ref_exchange_contract::mft_transfer(
                 TOKEN_ID.to_string(),
                 ValidAccountId::try_from(sender.clone()).unwrap(),
                 res.into(),
                 None,
-                "".to_string(),
                 &REF_EXCHANGE_CONTRACT_ID,
                 YOCTO_NEAR_1,
                 GAS_100,
@@ -130,11 +129,6 @@ impl Strategy {
     }
 
     pub fn harvesting_step_1(&mut self) {
-        if env::signer_account_id() != env::current_account_id() {
-            env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
-            return;
-        }
-
         // Claim Rewards
         env::log(format!("SUCCESS! Starting Process Claim Rewards").as_bytes());
         claim_rewards();
@@ -147,11 +141,6 @@ impl Strategy {
     }
 
     pub fn harvesting_step_2(&mut self) {
-        if env::signer_account_id() != env::current_account_id() {
-            env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
-            return;
-        }
-
         // Deposit Rewards into REF Wallet
         env::log(format!("SUCCESS! Starting Process Deposit Rewards into REF Wallet").as_bytes());
         deposit_rewards_into_ref_wallet();
@@ -160,11 +149,6 @@ impl Strategy {
     }
 
     pub fn harvesting_step_3(&mut self) {
-        if env::signer_account_id() != env::current_account_id() {
-            env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
-            return;
-        }
-
         // Swap rewards for Pool Tokens
         env::log(format!("SUCCESS! Starting Process Swap rewards for Pool Tokens").as_bytes());
         swap_rewards_for_pool_tokens();
@@ -176,11 +160,6 @@ impl Strategy {
     }
 
     pub fn harvesting_step_4(&mut self) {
-        if env::signer_account_id() != env::current_account_id() {
-            env::log(format!("ERROR! Signer Id is not same as Contract Owner").as_bytes());
-            return;
-        }
-
         // Add Liquidity
         env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
         add_liquidity_util();
