@@ -29,11 +29,11 @@ export default function App() {
     () => {
       // in this case, we only care to query the contract when signed in
       if (window.walletConnection.isSignedIn()) {
-
+        set_greeting("1000000000000000000")
         // window.contract is set by initContract in index.js
         // window.contract.get_greeting({ account_id: window.accountId })
         //   .then(greetingFromContract => {
-        //     set_greeting(greetingFromContract)
+        //    set_greeting(greetingFromContract)
         //   })
       }
     },
@@ -87,7 +87,8 @@ export default function App() {
           const { fieldset, greeting } = event.target.elements
 
           // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
-          const newGreeting = greeting.value
+          const deposit_amount = greeting.value
+          console.log(deposit_amount)
 
           // disable the form while the value gets updated on-chain
           fieldset.disabled = true
@@ -106,7 +107,7 @@ export default function App() {
               {
                 token_id: SEED_ID,
                 receiver_id: RECEIVER_ID,
-                amount: '1000000000000000000',
+                amount: deposit_amount, // Minimum required => '1000000000000000000'
                 msg: ''
               },
               GAS_300, // attached GAS 
@@ -126,7 +127,7 @@ export default function App() {
           }
 
           // update local `greeting` variable to match persisted value
-          set_greeting(newGreeting)
+          // set_greeting(newGreeting)
 
           // show Notification
           setShowNotification(true)
@@ -146,7 +147,7 @@ export default function App() {
                 marginBottom: '0.5em'
               }}
             >
-              Change greeting
+              Deposit Seeds ( Min. 1000000000000000000 )
             </label>
             <div style={{ display: 'flex' }}>
               <input
