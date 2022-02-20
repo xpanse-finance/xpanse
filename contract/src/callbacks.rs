@@ -1,6 +1,6 @@
 use crate::utils::{
     ext_ft, ext_ref_exchange_contract, ext_ref_farming_contract, SeedId, SwapAction, GAS_100,
-    GAS_52, GAS_80, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
+    GAS_52, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
     REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
     REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS,
     TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, TOKEN_ID, YOCTO_NEAR_0, YOCTO_NEAR_1,
@@ -161,11 +161,39 @@ impl Strategy {
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(_) => {
                 self.total_supply -= amount;
-                self.records
-                    .insert(&sender, &(self.claim.get(&sender).unwrap() - amount));
-                self.claim
-                    .insert(&sender, &(self.claim.get(&sender).unwrap() + issue));
+                let val = self.records.get(&sender);
+                let mut res = 0;
+                if val != None {
+                    res = val.unwrap();
+                }
+                self.records.insert(&sender, &(res - amount));
+
+                let mut res_claim = 0;
+                let val1 = self.claim.get(&sender);
+                if val1 != None {
+                    res_claim = val1.unwrap();
+                }
+                self.claim.insert(&sender, &(res_claim + issue));
                 self.to_claim += issue;
+                return "Success".to_string();
+            }
+        }
+    }
+
+    #[private]
+    pub fn post_claim(&mut self, sender: AccountId) -> String {
+        assert_eq!(env::promise_results_count(), 1, "This is a callback method");
+        match env::promise_result(0) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => "oops!".to_string(),
+            PromiseResult::Successful(_) => {
+                let val = self.claim.get(&sender);
+                let mut res = 0;
+                if val != None {
+                    res = val.unwrap();
+                }
+                self.to_claim -= res;
+                self.claim.insert(&sender, &0);
                 return "Success".to_string();
             }
         }
