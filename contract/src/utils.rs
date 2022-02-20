@@ -103,6 +103,7 @@ pub trait Strategy {
     fn internal_withdraw(&mut self, sender: AccountId, amount: u128);
     fn post_withdraw_seed(&mut self, sender: AccountId, amount: u128, issue: u128);
     fn internal_deposit_to_farm(&mut self) -> String;
+    fn deposit_to_farm(&mut self) -> String;
     fn post_claim(&mut self, sender: AccountId, res: u128) -> String;
 }
 
