@@ -4,8 +4,14 @@ import { login, logout } from './utils'
 import './global.css'
 import { Contract } from 'near-api-js'
 
-import { getConfig, REF_EXCHANGE_CONTRACT_ID, SEED_ID, RECEIVER_ID, GAS_300, YOCTO_NEAR_1 } from './config'
+import getConfig from './config'
 const { networkId } = getConfig(process.env.NODE_ENV || 'development')
+
+const REF_EXCHANGE_CONTRACT_ID = "exchange.ref-dev.testnet";
+const SEED_ID = ":5";
+const RECEIVER_ID = "amit3.testnet";
+const GAS_300 = "300000000000000";
+const YOCTO_NEAR_1 = "1";
 
 export default function App() {
   // use React Hooks to store greeting in component state

@@ -1,9 +1,4 @@
 const CONTRACT_NAME = process.env.CONTRACT_NAME || 'amit3'
-const REF_EXCHANGE_CONTRACT_ID = "exchange.ref-dev.testnet";
-const SEED_ID = ":5";
-const RECEIVER_ID = "amit3.testnet";
-const GAS_300 = "300000000000000";
-const YOCTO_NEAR_1 = "1";
 
 function getConfig(env) {
   switch (env) {
