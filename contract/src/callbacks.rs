@@ -3,7 +3,7 @@ use crate::utils::{
     GAS_52, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
     REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
     REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS,
-    TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, TOKEN_ID, YOCTO_NEAR_0, YOCTO_NEAR_1,
+    TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, TOKEN_ID, YOCTO_NEAR_0, YOCTO_NEAR_1, GAS_120
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -138,7 +138,7 @@ impl Strategy {
                     U128(issue),
                     &REF_FARMING_CONTRACT_ID,
                     YOCTO_NEAR_1,
-                    GAS_100,
+                    140_000_000_000_000,
                 )
                 .then(ext_self::post_withdraw_seed(
                     sender,
@@ -146,7 +146,7 @@ impl Strategy {
                     issue,
                     &env::current_account_id(),
                     YOCTO_NEAR_0,
-                    GAS_100,
+                    90_000_000_000_000,
                 ));
                 return "Success".to_string();
             }

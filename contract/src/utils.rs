@@ -78,6 +78,13 @@ trait RefExchangeContract {
         memo: Option<String>,
         msg: String,
     ) -> PromiseOrValue<U128>;
+    fn mft_transfer(
+        &mut self,
+        token_id: String,
+        receiver_id: ValidAccountId,
+        amount: U128,
+        memo: Option<String>,
+    );
 }
 
 #[ext_contract(ext_ft)]
