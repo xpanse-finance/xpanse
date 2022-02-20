@@ -1,8 +1,13 @@
-xpanse
+Xpanse
 ==================
 
-This [React] app was initialized with [create-near-app]
+The Yield Optimizer on NEAR Protocol.
 
+xpanse provides strategies that offers best returns on your assets across near protocol.
+
+![Xpanse](https://user-images.githubusercontent.com/85037852/154845518-6d8f20de-be99-412c-b5f1-6e59400d56e7.jpg)
+
+Many more strategies are coming soon!!
 
 Quick Start
 ===========
