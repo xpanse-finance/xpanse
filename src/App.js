@@ -2,8 +2,9 @@ import 'regenerator-runtime/runtime'
 import React from 'react'
 import { login, logout } from './utils'
 import './global.css'
+import { Contract } from 'near-api-js'
 
-import getConfig from './config'
+import { getConfig, REF_EXCHANGE_CONTRACT_ID, SEED_ID, RECEIVER_ID, GAS_300, YOCTO_NEAR_1 } from './config'
 const { networkId } = getConfig(process.env.NODE_ENV || 'development')
 
 export default function App() {
@@ -24,10 +25,10 @@ export default function App() {
       if (window.walletConnection.isSignedIn()) {
 
         // window.contract is set by initContract in index.js
-        window.contract.get_greeting({ account_id: window.accountId })
-          .then(greetingFromContract => {
-            set_greeting(greetingFromContract)
-          })
+        // window.contract.get_greeting({ account_id: window.accountId })
+        //   .then(greetingFromContract => {
+        //     set_greeting(greetingFromContract)
+        //   })
       }
     },
 
@@ -85,12 +86,27 @@ export default function App() {
           // disable the form while the value gets updated on-chain
           fieldset.disabled = true
 
+          const exchange_contract = new Contract(
+            window.walletConnection.account(), // the account object that is connecting
+            REF_EXCHANGE_CONTRACT_ID,
+            {
+              viewMethods: [], // view methods do not change state but usually return a value
+              changeMethods: ["mft_transfer_call"], // change methods modify state
+            }
+          );
           try {
             // make an update call to the smart contract
-            await window.contract.set_greeting({
-              // pass the value that the user entered in the greeting field
-              message: newGreeting
-            })
+            await exchange_contract.mft_transfer_call(
+              {
+                token_id: SEED_ID,
+                receiver_id: RECEIVER_ID,
+                amount: '1000000000000000000',
+                msg: ''
+              },
+              GAS_300, // attached GAS 
+              YOCTO_NEAR_1 // attached deposit in yoctoNEAR
+            )
+
           } catch (e) {
             alert(
               'Something went wrong! ' +
