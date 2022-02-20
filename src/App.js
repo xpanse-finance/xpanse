@@ -160,7 +160,7 @@ export default function App() {
                 // disabled={buttonDisabled}
                 style={{ borderRadius: '0 5px 5px 0' }}
               >
-                Save
+                Deposit Seeds
               </button>
             </div>
           </fieldset>
@@ -238,7 +238,79 @@ export default function App() {
                 // disabled={buttonDisabled}
                 style={{ borderRadius: '0 5px 5px 0' }}
               >
-                Save
+                Withdraw Seeds
+              </button>
+            </div>
+          </fieldset>
+        </form>
+        <form onSubmit={async event => {
+          event.preventDefault()
+
+          // get elements from the form using their id attribute
+          // const { fieldset, greeting } = event.target.elements
+
+          // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
+          // const withdraw_amount = greeting.value
+          // console.log(withdraw_amount)
+
+          // disable the form while the value gets updated on-chain
+          // fieldset.disabled = true
+
+          try {
+            // make an update call to the smart contract
+            await window.contract.claim(
+              {},
+              GAS_300, // attached GAS
+            )
+
+          } catch (e) {
+            alert(
+              'Something went wrong! ' +
+              'Maybe you need to sign out and back in? ' +
+              'Check your browser console for more info.'
+            )
+            throw e
+          } finally {
+            // re-enable the form, whether the call succeeded or failed
+            // fieldset.disabled = false
+          }
+
+          // update local `greeting` variable to match persisted value
+          // set_greeting(newGreeting)
+
+          // show Notification
+          setShowNotification(true)
+
+          // remove Notification again after css animation completes
+          // this allows it to be shown again next time the form is submitted
+          setTimeout(() => {
+            setShowNotification(false)
+          }, 11000)
+        }}>
+          <fieldset id="fieldset">
+            <label
+              htmlFor="greeting"
+              style={{
+                display: 'block',
+                color: 'var(--gray)',
+                marginBottom: '0.5em'
+              }}
+            >
+              Claim Amount
+            </label>
+            <div style={{ display: 'flex' }}>
+              {/* <input
+                autoComplete="off"
+                defaultValue={greeting}
+                id="greeting"
+                // onChange={e => setButtonDisabled(e.target.value === greeting)}
+                style={{ flex: 1 }}
+              /> */}
+              <button
+                // disabled={buttonDisabled}
+                style={{ borderRadius: '0 5px 5px 0' }}
+              >
+                Claim Amount
               </button>
             </div>
           </fieldset>
