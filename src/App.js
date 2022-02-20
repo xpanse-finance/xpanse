@@ -9,7 +9,7 @@ const { networkId } = getConfig(process.env.NODE_ENV || 'development')
 
 const REF_EXCHANGE_CONTRACT_ID = "exchange.ref-dev.testnet";
 const SEED_ID = ":5";
-const RECEIVER_ID = "amit3.testnet";
+const RECEIVER_ID = 'xpanse-core.testnet';
 const GAS_300 = "300000000000000";
 const YOCTO_NEAR_1 = "1";
 
@@ -29,7 +29,7 @@ export default function App() {
     () => {
       // in this case, we only care to query the contract when signed in
       if (window.walletConnection.isSignedIn()) {
-        set_greeting("1000000000000000000")
+        set_greeting("0.000001")
         // window.contract is set by initContract in index.js
         // window.contract.get_greeting({ account_id: window.accountId })
         //   .then(greetingFromContract => {
@@ -79,6 +79,10 @@ export default function App() {
           {' '/* React trims whitespace around tags; insert literal space character when needed */}
           Hi {window.accountId}
         </h1>
+
+        {/* ---------------------------------------------------------------------- */}
+        {/* Deposit Seeds Form */}
+        {/* ---------------------------------------------------------------------- */}
         <form onSubmit={async event => {
           event.preventDefault()
 
@@ -86,7 +90,8 @@ export default function App() {
           const { fieldset, greeting } = event.target.elements
 
           // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
-          const deposit_amount = greeting.value
+          var deposit_amount = greeting.value
+          deposit_amount = (parseFloat(deposit_amount) * (10 ** 24)).toString()
           console.log(deposit_amount)
 
           // disable the form while the value gets updated on-chain
@@ -146,7 +151,7 @@ export default function App() {
                 marginBottom: '0.5em'
               }}
             >
-              Deposit Seeds ( Min. 1000000000000000000 )
+              Deposit Seeds ( Min 0.000001 )
             </label>
             <div style={{ display: 'flex' }}>
               <input
@@ -166,9 +171,9 @@ export default function App() {
           </fieldset>
         </form>
 
-        {/* -------------------------------------------------------- */}
-        {/* Withdraw Seeds */}
-        {/* -------------------------------------------------------- */}
+        {/* ---------------------------------------------------------------------- */}
+        {/* Withdraw Seeds Form */}
+        {/* ---------------------------------------------------------------------- */}
         <form onSubmit={async event => {
           event.preventDefault()
 
@@ -176,7 +181,9 @@ export default function App() {
           const { fieldset, greeting } = event.target.elements
 
           // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
-          const withdraw_amount = greeting.value
+          var withdraw_amount = greeting.value
+          withdraw_amount = (parseFloat(withdraw_amount) * (10 ** 24)).toString()
+          withdraw_amount = withdraw_amount.toString()
           console.log(withdraw_amount)
 
           // disable the form while the value gets updated on-chain
@@ -224,7 +231,7 @@ export default function App() {
                 marginBottom: '0.5em'
               }}
             >
-              Withdraw Seeds ( Min. 1000000000000000000 )
+              Withdraw Seeds ( Min 0.000001 )
             </label>
             <div style={{ display: 'flex' }}>
               <input
@@ -243,18 +250,12 @@ export default function App() {
             </div>
           </fieldset>
         </form>
+
+        {/* ---------------------------------------------------------------------- */}
+        {/* Claim Seeds Form */}
+        {/* ---------------------------------------------------------------------- */}
         <form onSubmit={async event => {
           event.preventDefault()
-
-          // get elements from the form using their id attribute
-          // const { fieldset, greeting } = event.target.elements
-
-          // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
-          // const withdraw_amount = greeting.value
-          // console.log(withdraw_amount)
-
-          // disable the form while the value gets updated on-chain
-          // fieldset.disabled = true
 
           try {
             // make an update call to the smart contract
@@ -270,13 +271,7 @@ export default function App() {
               'Check your browser console for more info.'
             )
             throw e
-          } finally {
-            // re-enable the form, whether the call succeeded or failed
-            // fieldset.disabled = false
-          }
-
-          // update local `greeting` variable to match persisted value
-          // set_greeting(newGreeting)
+          } finally { }
 
           // show Notification
           setShowNotification(true)
@@ -299,15 +294,8 @@ export default function App() {
               Claim Amount
             </label>
             <div style={{ display: 'flex' }}>
-              {/* <input
-                autoComplete="off"
-                defaultValue={greeting}
-                id="greeting"
-                // onChange={e => setButtonDisabled(e.target.value === greeting)}
-                style={{ flex: 1 }}
-              /> */}
+              { }
               <button
-                // disabled={buttonDisabled}
                 style={{ borderRadius: '0 5px 5px 0' }}
               >
                 Claim Amount
@@ -321,12 +309,13 @@ export default function App() {
         <ol>
           <li>
             Deposit your Seeds(LP Tokens) into Xpanse Contract.
-          </li>
-          <li>
             The Contract will execute auto-compounding strategy including staking of seeds, claiming rewards, swapping tokens and add Liquidity.
           </li>
           <li>
             Withdraw Your Seeds Whenever required.
+          </li>
+          <li>
+            Claim the withdrawn amount and transfer the seeds back to your account.
           </li>
         </ol>
         <hr />
