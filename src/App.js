@@ -231,7 +231,7 @@ export default function App() {
                 marginBottom: '0.5em'
               }}
             >
-              Withdraw Seeds ( Min 0.000001 )
+              Withdraw Seeds
             </label>
             <div style={{ display: 'flex' }}>
               <input
