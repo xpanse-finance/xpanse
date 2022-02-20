@@ -6,8 +6,9 @@ use std::convert::TryFrom;
 
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
-    ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards, TOKEN_ID, GAS_10, GAS_250, STAKED_SEEDS,
-    YOCTO_NEAR_0, ext_ref_farming_contract, GAS_160, REF_FARMING_CONTRACT_ID, REF_EXCHANGE_CONTRACT_ID
+    ext_ref_farming_contract, ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards,
+    GAS_10, GAS_160, GAS_250, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
+    TOKEN_ID, YOCTO_NEAR_0,
 };
 
 mod callbacks;
@@ -22,7 +23,8 @@ pub struct Strategy {
     records: LookupMap<String, u128>, // Map of address -> shares in contract
     total_supply: u128,               // total supply of shares issued from the contract
     claim: LookupMap<String, u128>,
-    to_deposit: u128
+    to_deposit: u128,
+    to_claim: u128
 }
 
 impl Default for Strategy {
@@ -32,6 +34,7 @@ impl Default for Strategy {
             claim: LookupMap::new(b"aa".to_vec()),
             total_supply: 0,
             to_deposit: 0,
+            to_claim: 0
         }
     }
 }
@@ -60,8 +63,6 @@ impl Strategy {
     }
 
     pub fn deposit_to_farm(&mut self) {
-        let x: u128 = env::prepaid_gas as u128;
-        env::log(format!("Deposited amount '{:?}'", x).as_bytes());
         ext_ref_exchange_contract::mft_balance_of(
             TOKEN_ID.to_string(),
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
@@ -82,10 +83,9 @@ impl Strategy {
             env::panic(format!("Not enough balance!").as_bytes());
         }
         // exchange rate = balance of mft / total_supply
-        ext_ref_exchange_contract::mft_balance_of(
-            STAKED_SEEDS.to_string(),
+        ext_ref_farming_contract::list_user_seeds(
             ValidAccountId::try_from(env::current_account_id()).unwrap(),
-            &env::current_account_id(),
+            &REF_FARMING_CONTRACT_ID,
             YOCTO_NEAR_0,
             GAS_10,
         )
