@@ -181,17 +181,12 @@ impl Strategy {
     }
 
     #[private]
-    pub fn post_claim(&mut self, sender: AccountId) -> String {
+    pub fn post_claim(&mut self, sender: AccountId, res: u128) -> String {
         assert_eq!(env::promise_results_count(), 1, "This is a callback method");
         match env::promise_result(0) {
             PromiseResult::NotReady => unreachable!(),
             PromiseResult::Failed => "oops!".to_string(),
             PromiseResult::Successful(_) => {
-                let val = self.claim.get(&sender);
-                let mut res = 0;
-                if val != None {
-                    res = val.unwrap();
-                }
                 self.to_claim -= res;
                 self.claim.insert(&sender, &0);
                 return "Success".to_string();

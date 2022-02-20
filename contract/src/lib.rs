@@ -7,8 +7,8 @@ use std::convert::TryFrom;
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
     ext_ref_farming_contract, ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards,
-    GAS_10, GAS_160, GAS_250, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
-    TOKEN_ID, YOCTO_NEAR_0,
+    GAS_10, GAS_100, GAS_160, GAS_250, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, TOKEN_ID,
+    YOCTO_NEAR_0, YOCTO_NEAR_1,
 };
 
 mod callbacks;
@@ -24,7 +24,7 @@ pub struct Strategy {
     total_supply: u128,               // total supply of shares issued from the contract
     claim: LookupMap<String, u128>,
     to_deposit: u128,
-    to_claim: u128
+    to_claim: u128,
 }
 
 impl Default for Strategy {
@@ -34,7 +34,7 @@ impl Default for Strategy {
             claim: LookupMap::new(b"aa".to_vec()),
             total_supply: 0,
             to_deposit: 0,
-            to_claim: 0
+            to_claim: 0,
         }
     }
 }
@@ -97,6 +97,36 @@ impl Strategy {
             GAS_250,
         ));
         env::log(format!("Withdraw amount '{:?}' from '{:?}'", amount, sender).as_bytes());
+    }
+
+    pub fn claim(&mut self) {
+        let sender = env::signer_account_id();
+        let claim_val = self.claim.get(&sender);
+        let mut res = 0;
+        if claim_val != None {
+            res = claim_val.unwrap();
+        }
+
+        if res > 0 {
+            ext_ref_exchange_contract::mft_transfer_call(
+                TOKEN_ID.to_string(),
+                ValidAccountId::try_from(sender.clone()).unwrap(),
+                res.into(),
+                None,
+                "".to_string(),
+                &REF_EXCHANGE_CONTRACT_ID,
+                YOCTO_NEAR_1,
+                GAS_100,
+            )
+            .then(ext_self::post_claim(
+                sender.clone(),
+                res,
+                &env::current_account_id(),
+                YOCTO_NEAR_0,
+                GAS_160,
+            ));
+        }
+        env::log(format!("Claimed amount '{:?}' to '{:?}'", res, sender).as_bytes());
     }
 
     pub fn harvesting_step_1(&mut self) {
