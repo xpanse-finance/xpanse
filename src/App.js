@@ -8,7 +8,7 @@ import getConfig from './config'
 const { networkId } = getConfig('development')
 
 const REF_EXCHANGE_CONTRACT_ID = "exchange.ref-dev.testnet";
-const SEED_ID = ":5";
+const SEED_ID = ":107";
 const RECEIVER_ID = 'xpanse-core.testnet';
 const GAS_300 = "300000000000000";
 const YOCTO_NEAR_1 = "1";
