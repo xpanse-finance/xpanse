@@ -12,7 +12,30 @@ Many more strategies are coming soon!!
 Interface
 ===========
 
-https://6213964a2ad0500007ee7a8a--admiring-ramanujan-511112.netlify.app/
+https://6213c4aedd23a33f094dc4fa--admiring-ramanujan-511112.netlify.app/
+
+Commands for using this strategy from near-cli
+===========
+
+- Deposit token to strategy
+```
+near call exchange.ref-dev.testnet mft_transfer_call '{"token_id": ":107", "receiver_id": "xpanse-strategy.testnet","amount":"1000000000000000000", "msg":""}' --account_id <sender-id>.testnet --depositYocto '1'  --gas '300000000000000'
+```
+
+- Withdraw token from strategy
+```
+near call xpanse-strategy.testnet '{"amount": "1000000000000000000"}' --account_id <sender-id> --depositYocto '1'  --gas '300000000000000'
+```
+
+- Harvesting calls
+```
+near call xpanse-strategy.testnet harvesting_step_1 --account-id <sender-id>.testnet --gas '300000000000000'
+near call xpanse-strategy.testnet harvesting_step_2 --account-id <sender-id>.testnet --gas '300000000000000'
+near call xpanse-strategy.testnet harvesting_step_3 --account-id <sender-id>.testnet --gas '300000000000000'
+near call xpanse-strategy.testnet harvesting_step_4 --account-id <sender-id>.testnet --gas '300000000000000'
+near call xpanse-strategy.testnet harvesting_step_5 --account-id <sender-id>.testnet --gas '300000000000000'
+near call xpanse-strategy.testnet harvesting_step_6 --account-id <sender-id>.testnet --gas '300000000000000'
+```
 
 Quick Start
 ===========
