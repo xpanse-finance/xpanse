@@ -6,9 +6,9 @@ use std::convert::TryFrom;
 
 use crate::utils::{
     add_liquidity_util, claim_rewards, deposit_rewards_into_ref_wallet, ext_ref_exchange_contract,
-    ext_ref_farming_contract, ext_self, swap_rewards_for_pool_tokens, withdraw_farm_rewards,
-    GAS_10, GAS_100, GAS_160, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, TOKEN_ID,
-    YOCTO_NEAR_0, YOCTO_NEAR_1,
+    ext_ref_farming_contract, ext_self, necessary_swaps_required_util,
+    swap_rewards_for_pool_tokens, withdraw_farm_rewards, GAS_10, GAS_100, GAS_160,
+    REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID, TOKEN_ID, YOCTO_NEAR_0, YOCTO_NEAR_1,
 };
 
 mod callbacks;
@@ -149,6 +149,14 @@ impl Strategy {
     }
 
     pub fn harvesting_step_3(&mut self) {
+        // Necessary Swaps Required in case Rewards does have direct pool with Required Tokens
+        env::log(format!("SUCCESS! Starting Process Necessary Swaps").as_bytes());
+        necessary_swaps_required_util();
+
+        env::log(format!("SUCCESS! Harvesting Step 3 Complete").as_bytes());
+    }
+
+    pub fn harvesting_step_4(&mut self) {
         // Swap rewards for Pool Tokens
         env::log(format!("SUCCESS! Starting Process Swap rewards for Pool Tokens").as_bytes());
         swap_rewards_for_pool_tokens();
@@ -156,18 +164,18 @@ impl Strategy {
         // Add Liquidity
         env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
 
-        env::log(format!("SUCCESS! Harvesting Step 3 Complete").as_bytes());
-    }
-
-    pub fn harvesting_step_4(&mut self) {
-        // Add Liquidity
-        env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
-        add_liquidity_util();
-
         env::log(format!("SUCCESS! Harvesting Step 4 Complete").as_bytes());
     }
 
     pub fn harvesting_step_5(&mut self) {
+        // Add Liquidity
+        env::log(format!("SUCCESS! Starting Process Add Liquidity").as_bytes());
+        add_liquidity_util();
+
+        env::log(format!("SUCCESS! Harvesting Step 5 Complete").as_bytes());
+    }
+
+    pub fn harvesting_step_6(&mut self) {
         // Deposit to Farm
         env::log(format!("SUCCESS! Deposit to Farm").as_bytes());
         ext_self::deposit_to_farm(
@@ -176,70 +184,6 @@ impl Strategy {
             275_000_000_000_000,
         );
 
-        env::log(format!("SUCCESS! Harvesting Step 5 Complete").as_bytes());
+        env::log(format!("SUCCESS! Harvesting Step 6 Complete").as_bytes());
     }
-}
-
-/*
- * The rest of this file holds the inline tests for the code above
- * Learn more about Rust tests: https://doc.rust-lang.org/book/ch11-01-writing-tests.html
- *
- * To run from contract directory:
- * cargo test -- --nocapture
- *
- * From project root, to run in combination with frontend tests:
- * yarn test
- *
- */
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use near_sdk::MockedBlockchain;
-    use near_sdk::{testing_env, VMContext};
-
-    // mock the context for testing, notice "signer_account_id" that was accessed above from env::
-    fn get_context(input: Vec<u8>, is_view: bool) -> VMContext {
-        VMContext {
-            current_account_id: "alice_near".to_string(),
-            signer_account_id: "bob_near".to_string(),
-            signer_account_pk: vec![0, 1, 2],
-            predecessor_account_id: "carol_near".to_string(),
-            input,
-            block_index: 0,
-            block_timestamp: 0,
-            account_balance: 0,
-            account_locked_balance: 0,
-            storage_usage: 0,
-            attached_deposit: 0,
-            prepaid_gas: 10u64.pow(18),
-            random_seed: vec![0, 1, 2],
-            is_view,
-            output_data_receivers: vec![],
-            epoch_height: 19,
-        }
-    }
-
-    // #[test]
-    // fn set_then_get_greeting() {
-    //     let context = get_context(vec![], false);
-    //     testing_env!(context);
-    //     let mut contract = Welcome::default();
-    //     // contract.set_greeting("howdy".to_string());
-    //     assert_eq!(
-    //         "howdy".to_string(),
-    //         contract.get_greeting("bob_near".to_string())
-    //     );
-    // }
-
-    // #[test]
-    // fn get_default_greeting() {
-    //     let context = get_context(vec![], true);
-    //     testing_env!(context);
-    //     let contract = Welcome::default();
-    //     // this test did not call set_greeting so should return the default "Hello" greeting
-    //     assert_eq!(
-    //         "Hello".to_string(),
-    //         contract.get_greeting("francis.near".to_string())
-    //     );
-    // }
 }

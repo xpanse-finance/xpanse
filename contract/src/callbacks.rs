@@ -1,6 +1,6 @@
 use crate::utils::{
     ext_ft, ext_ref_exchange_contract, ext_ref_farming_contract, SeedId, SwapAction, GAS_100,
-    GAS_120, GAS_52, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
+    GAS_52, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
     REWARDS_SWAPPED_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
     REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS,
     TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, TOKEN_ID, YOCTO_NEAR_0, YOCTO_NEAR_1,
@@ -369,6 +369,61 @@ impl Strategy {
                 ],
                 &REF_EXCHANGE_CONTRACT_ID,
                 YOCTO_NEAR_1,
+                GAS_100,
+            );
+        }
+        return "Success".to_string();
+    }
+
+    #[private]
+    pub fn necessary_swaps_required_util_callback(
+        &self,
+        token_in: String,
+        token_out: String,
+        given_pool_id: String,
+    ) -> String {
+        assert_eq!(
+            env::promise_results_count(),
+            1,
+            "Did not receive Equal Callbacks"
+        );
+
+        env::log(
+            format!(
+                "SUCCESS! Token in - {}  Token out - {} and Pool Id - {}",
+                token_in, token_out, given_pool_id
+            )
+            .as_bytes(),
+        );
+
+        let amount_in_wallet: u128 = match env::promise_result(0) {
+            PromiseResult::NotReady => unreachable!(),
+            PromiseResult::Failed => env::panic(b"Unable to make comparison"),
+            PromiseResult::Successful(result) => near_sdk::serde_json::from_slice::<U128>(&result)
+                .unwrap()
+                .into(),
+        };
+        env::log(
+            format!(
+                "SUCCESS! Amount of {} in Wallet {}",
+                token_in, amount_in_wallet
+            )
+            .as_bytes(),
+        );
+
+        let given_pool_id: u64 = given_pool_id.parse::<u64>().unwrap();
+        if amount_in_wallet != 0 {
+            let swap_details_1 = SwapAction {
+                pool_id: given_pool_id,
+                token_in: token_in,
+                amount_in: amount_in_wallet.to_string(),
+                token_out: token_out,
+                min_amount_out: "0".to_string(),
+            };
+            ext_ref_exchange_contract::swap(
+                vec![swap_details_1],
+                &REF_EXCHANGE_CONTRACT_ID,
+                YOCTO_NEAR_0,
                 GAS_100,
             );
         }

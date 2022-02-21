@@ -13,12 +13,10 @@ pub const GAS_5: u64 = 5_000_000_000_000;
 pub const GAS_10: u64 = 10_000_000_000_000;
 pub const GAS_40: u64 = 40_000_000_000_000;
 pub const GAS_52: u64 = 52_000_000_000_000;
-pub const GAS_80: u64 = 80_000_000_000_000;
 pub const GAS_100: u64 = 100_000_000_000_000;
 pub const GAS_120: u64 = 120_000_000_000_000;
 pub const GAS_160: u64 = 160_000_000_000_000;
 pub const GAS_200: u64 = 200_000_000_000_000;
-pub const GAS_250: u64 = 250_000_000_000_000;
 
 // Token Amount
 pub const TOKEN_100: u128 = 100;
@@ -43,6 +41,10 @@ pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [bool; 1] = [true];
 pub const REWARDS_TOKEN1_SWAP_POOLS_ID_U64: [u64; 1] = [321];
 pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [bool; 1] = [true];
 pub const REWARDS_TOKEN2_SWAP_POOLS_ID_U64: [u64; 1] = [20];
+
+pub const NECESSARY_SWAPS_REQUIRED: [[&str; 3]; 1] =
+    // Token In, Token Out, Pool ID
+    [["paras.fakes.testnet", "ref.fakes.testnet", "5"]];
 
 pub(crate) type SeedId = String;
 // Traits
@@ -97,6 +99,12 @@ pub trait FungibleToken {
 pub trait Strategy {
     fn deposit_rewards_into_ref_wallet_callback(&self, reward_id: String) -> String;
     fn swap_rewards_for_pool_tokens_callback(&self, reward_id: String) -> String;
+    fn necessary_swaps_required_util_callback(
+        &self,
+        token_in: String,
+        token_out: String,
+        given_pool_id: String,
+    ) -> String;
     fn add_liquidity_util_callback(&self) -> String;
     fn internal_deposit(&mut self, sender: AccountId, amount: u128);
     fn post_mft_transfer(&mut self) -> String;
@@ -220,4 +228,24 @@ pub fn add_liquidity_util() {
         YOCTO_NEAR_0,
         GAS_200,
     ));
+}
+
+pub fn necessary_swaps_required_util() {
+    for nec_swaps in NECESSARY_SWAPS_REQUIRED {
+        ext_ref_exchange_contract::get_deposit(
+            env::current_account_id(),
+            nec_swaps[0].to_string(), // Token In
+            &REF_EXCHANGE_CONTRACT_ID,
+            YOCTO_NEAR_0,
+            GAS_5,
+        )
+        .then(ext_self::necessary_swaps_required_util_callback(
+            nec_swaps[0].to_string(), // Token In
+            nec_swaps[1].to_string(), // Token Out
+            nec_swaps[2].to_string(), // Pool Id
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            GAS_160,
+        ));
+    }
 }
