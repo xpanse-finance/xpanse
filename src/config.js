@@ -1,5 +1,5 @@
 // const CONTRACT_NAME = process.env.CONTRACT_NAME
-const CONTRACT_NAME = 'xpanse-core.testnet'
+const CONTRACT_NAME = 'xpanse-strategy.testnet'
 
 function getConfig(env) {
   switch (env) {
