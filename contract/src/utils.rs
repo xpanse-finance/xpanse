@@ -1,6 +1,7 @@
 use near_sdk::json_types::{ValidAccountId, U128};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, ext_contract};
+use uint::construct_uint;
 
 pub const MFT_TAG: &str = "@";
 
@@ -25,6 +26,11 @@ pub const TOKEN_100: u128 = 100;
 pub const STAKED_SEEDS: &str = "exchange.ref-dev.testnet@107";
 
 pub const TOKEN_ID: &str = ":107";
+
+construct_uint! {
+    /// 256-bit unsigned integer.
+    pub struct u256(4);
+}
 
 // Contracts
 pub const TOKEN1_CONTRACT_ID: &str = "eth.fakes.testnet";

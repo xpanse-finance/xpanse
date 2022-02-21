@@ -121,8 +121,9 @@ export default function App() {
           } catch (e) {
             alert(
               'Something went wrong! ' +
-              'Maybe you need to sign out and back in? ' +
-              'Check your browser console for more info.'
+              'Try Changing the Input Value !!' +
+              'Check your browser console for more info.' +
+              'Maybe you need to sign out and back in? '
             )
             throw e
           } finally {
@@ -201,8 +202,9 @@ export default function App() {
           } catch (e) {
             alert(
               'Something went wrong! ' +
-              'Maybe you need to sign out and back in? ' +
-              'Check your browser console for more info.'
+              'Try Changing the Input Value !!' +
+              'Check your browser console for more info.' +
+              'Maybe you need to sign out and back in? '
             )
             throw e
           } finally {
@@ -267,8 +269,9 @@ export default function App() {
           } catch (e) {
             alert(
               'Something went wrong! ' +
-              'Maybe you need to sign out and back in? ' +
-              'Check your browser console for more info.'
+              'Try Changing the Input Value !!' +
+              'Check your browser console for more info.' +
+              'Maybe you need to sign out and back in? '
             )
             throw e
           } finally { }
@@ -334,7 +337,7 @@ function Notification() {
         {window.accountId}
       </a>
       {' '/* React trims whitespace around tags; insert literal space character when needed */}
-      called method: 'set_greeting' in contract:
+      called method: On contract:
       {' '}
       <a target="_blank" rel="noreferrer" href={`${urlPrefix}/${window.contract.contractId}`}>
         {window.contract.contractId}

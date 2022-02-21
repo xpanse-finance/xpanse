@@ -1,5 +1,5 @@
 use crate::utils::{
-    ext_ft, ext_ref_exchange_contract, ext_ref_farming_contract, SeedId, SwapAction, GAS_100,
+    ext_ft, ext_ref_exchange_contract, ext_ref_farming_contract, u256, SeedId, SwapAction, GAS_100,
     GAS_52, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
     REWARDS_SWAPPED_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
     REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS,
@@ -48,7 +48,9 @@ impl Strategy {
                     self.records.insert(&sender, &(res + issue));
                 } else {
                     let bal: u128 = bala.into();
-                    let issue: u128 = (self.total_supply * amount) / bal;
+                    let issue: u128 = ((u256::from(self.total_supply) * u256::from(amount))
+                        / u256::from(bal))
+                    .as_u128();
                     self.total_supply += issue;
                     self.records.insert(&sender, &(res + issue));
                 }
@@ -132,7 +134,9 @@ impl Strategy {
                     .as_bytes(),
                 );
                 let bal: u128 = balance.clone().into();
-                let issue: u128 = (bal * amount) / self.total_supply;
+                let issue: u128 = ((u256::from(bal) * u256::from(amount))
+                    / u256::from(self.total_supply))
+                .as_u128();
                 ext_ref_farming_contract::withdraw_seed(
                     STAKED_SEEDS.to_string(),
                     U128(issue),
