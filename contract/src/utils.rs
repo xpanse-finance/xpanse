@@ -38,11 +38,11 @@ pub const REF_EXCHANGE_CONTRACT_ID: &str = "exchange.ref-dev.testnet";
 // Pools ( False means no pool exist)
 pub const LIQUIDITY_POOL_ID: u64 = 107;
 
-pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [bool; 2] = [true, false];
-pub const REWARDS_TOKEN1_SWAP_POOLS_ID_U64: [u64; 2] = [321, 0];
-
-pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [bool; 2] = [true, false];
-pub const REWARDS_TOKEN2_SWAP_POOLS_ID_U64: [u64; 2] = [20, 0];
+pub const REWARDS_SWAPPED_CONTRACT_IDS: [&str; 1] = ["ref.fakes.testnet"];
+pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [bool; 1] = [true];
+pub const REWARDS_TOKEN1_SWAP_POOLS_ID_U64: [u64; 1] = [321];
+pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [bool; 1] = [true];
+pub const REWARDS_TOKEN2_SWAP_POOLS_ID_U64: [u64; 1] = [20];
 
 pub(crate) type SeedId = String;
 // Traits
@@ -173,7 +173,7 @@ pub fn deposit_rewards_into_ref_wallet() {
 
 // Swap Rewards for Pool Tokens
 pub fn swap_rewards_for_pool_tokens() {
-    for reward_id in REWARDS_CONTRACT_IDS {
+    for reward_id in REWARDS_SWAPPED_CONTRACT_IDS {
         ext_ref_exchange_contract::get_return(
             LIQUIDITY_POOL_ID,
             TOKEN1_CONTRACT_ID.to_string(),

@@ -1,9 +1,9 @@
 use crate::utils::{
     ext_ft, ext_ref_exchange_contract, ext_ref_farming_contract, SeedId, SwapAction, GAS_100,
-    GAS_52, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
-    REWARDS_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
+    GAS_120, GAS_52, LIQUIDITY_POOL_ID, REF_EXCHANGE_CONTRACT_ID, REF_FARMING_CONTRACT_ID,
+    REWARDS_SWAPPED_CONTRACT_IDS, REWARDS_TOKEN1_SWAP_POOLS_ID, REWARDS_TOKEN1_SWAP_POOLS_ID_U64,
     REWARDS_TOKEN2_SWAP_POOLS_ID, REWARDS_TOKEN2_SWAP_POOLS_ID_U64, STAKED_SEEDS,
-    TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, TOKEN_ID, YOCTO_NEAR_0, YOCTO_NEAR_1, GAS_120
+    TOKEN1_CONTRACT_ID, TOKEN2_CONTRACT_ID, TOKEN_100, TOKEN_ID, YOCTO_NEAR_0, YOCTO_NEAR_1,
 };
 use crate::*;
 use near_sdk::json_types::U128;
@@ -289,7 +289,7 @@ impl Strategy {
         );
 
         let mut index = 0;
-        for temp_reward in REWARDS_CONTRACT_IDS {
+        for temp_reward in REWARDS_SWAPPED_CONTRACT_IDS {
             if temp_reward == reward_id {
                 break;
             }
