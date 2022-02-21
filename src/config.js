@@ -1,4 +1,4 @@
-// const CONTRACT_NAME = process.env.CONTRACT_NAME || 'amit3'
+// const CONTRACT_NAME = process.env.CONTRACT_NAME
 const CONTRACT_NAME = 'xpanse-core.testnet'
 
 function getConfig(env) {
@@ -7,12 +7,12 @@ function getConfig(env) {
     case 'production':
     case 'mainnet':
       return {
-        networkId: 'mainnet',
-        nodeUrl: 'https://rpc.mainnet.near.org',
+        networkId: 'testnet',
+        nodeUrl: 'https://rpc.testnet.near.org',
         contractName: CONTRACT_NAME,
-        walletUrl: 'https://wallet.near.org',
-        helperUrl: 'https://helper.mainnet.near.org',
-        explorerUrl: 'https://explorer.mainnet.near.org',
+        walletUrl: 'https://wallet.testnet.near.org',
+        helperUrl: 'https://helper.testnet.near.org',
+        explorerUrl: 'https://explorer.testnet.near.org',
       }
     case 'development':
     case 'testnet':
