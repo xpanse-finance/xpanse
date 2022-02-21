@@ -1,4 +1,4 @@
-// const CONTRACT_NAME = process.env.CONTRACT_NAME || 'amit3'
+// const CONTRACT_NAME = process.env.CONTRACT_NAME
 const CONTRACT_NAME = 'xpanse-core.testnet'
 
 function getConfig(env) {

@@ -5,7 +5,7 @@ import './global.css'
 import { Contract } from 'near-api-js'
 
 import getConfig from './config'
-const { networkId } = getConfig(process.env.NODE_ENV || 'development')
+const { networkId } = getConfig('development')
 
 const REF_EXCHANGE_CONTRACT_ID = "exchange.ref-dev.testnet";
 const SEED_ID = ":5";
