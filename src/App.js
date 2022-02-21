@@ -233,7 +233,7 @@ export default function App() {
                 marginBottom: '0.5em'
               }}
             >
-              Withdraw Seeds
+              Withdraw Shares
             </label>
             <div style={{ display: 'flex' }}>
               <input
@@ -315,7 +315,7 @@ export default function App() {
             The Contract will execute auto-compounding strategy including staking of seeds, claiming rewards, swapping tokens and add Liquidity.
           </li>
           <li>
-            Withdraw Your Seeds Whenever required.
+            Withdraw Your Shares. ( The value of One share is <b>total seeds deposited / total supply of shares</b> ). This is possible the amount you deposited vs the value you are trying to withdraw is less. So Please try changing the withdraw amount.
           </li>
           <li>
             Claim the withdrawn amount and transfer the seeds back to your account.
