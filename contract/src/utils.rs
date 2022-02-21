@@ -24,25 +24,25 @@ pub const GAS_250: u64 = 250_000_000_000_000;
 pub const TOKEN_100: u128 = 100;
 
 // Seeds
-pub const STAKED_SEEDS: &str = "exchange.ref-dev.testnet@5";
+pub const STAKED_SEEDS: &str = "exchange.ref-dev.testnet@107";
 
-pub const TOKEN_ID: &str = ":5";
+pub const TOKEN_ID: &str = ":107";
 
 // Contracts
-pub const TOKEN1_CONTRACT_ID: &str = "paras.fakes.testnet";
-pub const TOKEN2_CONTRACT_ID: &str = "ref.fakes.testnet";
-pub const REWARDS_CONTRACT_IDS: [&str; 2] = ["ref.fakes.testnet", "pulse.fakes.testnet"];
+pub const TOKEN1_CONTRACT_ID: &str = "eth.fakes.testnet";
+pub const TOKEN2_CONTRACT_ID: &str = "aurora.fakes.testnet";
+pub const REWARDS_CONTRACT_IDS: [&str; 2] = ["ref.fakes.testnet", "paras.fakes.testnet"];
 pub const REF_FARMING_CONTRACT_ID: &str = "farm110.ref-dev.testnet";
 pub const REF_EXCHANGE_CONTRACT_ID: &str = "exchange.ref-dev.testnet";
 
 // Pools ( False means no pool exist)
-pub const LIQUIDITY_POOL_ID: u64 = 5;
+pub const LIQUIDITY_POOL_ID: u64 = 107;
 
-pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [bool; 2] = [true, true];
-pub const REWARDS_TOKEN1_SWAP_POOLS_ID_U64: [u64; 2] = [5, 6];
+pub const REWARDS_TOKEN1_SWAP_POOLS_ID: [bool; 2] = [true, false];
+pub const REWARDS_TOKEN1_SWAP_POOLS_ID_U64: [u64; 2] = [321, 0];
 
-pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [bool; 2] = [false, true];
-pub const REWARDS_TOKEN2_SWAP_POOLS_ID_U64: [u64; 2] = [0, 290];
+pub const REWARDS_TOKEN2_SWAP_POOLS_ID: [bool; 2] = [true, false];
+pub const REWARDS_TOKEN2_SWAP_POOLS_ID_U64: [u64; 2] = [20, 0];
 
 pub(crate) type SeedId = String;
 // Traits
