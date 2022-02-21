@@ -14,10 +14,14 @@ Commands for using this strategy from near-cli
 ===========
 
 - Deposit token to strategy
-```near call exchange.ref-dev.testnet mft_transfer_call '{"token_id": ":107", "receiver_id": "xpanse-strategy.testnet","amount":"1000000000000000000", "msg":""}' --account_id <sender-id>.testnet --depositYocto '1'  --gas '300000000000000'```
+```
+near call exchange.ref-dev.testnet mft_transfer_call '{"token_id": ":107", "receiver_id": "xpanse-strategy.testnet","amount":"1000000000000000000", "msg":""}' --account_id <sender-id>.testnet --depositYocto '1'  --gas '300000000000000'
+```
 
 - Withdraw token from strategy
-```near call xpanse-strategy.testnet '{"amount": "1000000000000000000"}' --account_id <sender-id> --depositYocto '1'  --gas '300000000000000'```
+```
+near call xpanse-strategy.testnet '{"amount": "1000000000000000000"}' --account_id <sender-id> --depositYocto '1'  --gas '300000000000000'
+```
 
 - Harvesting calls
 ```
