@@ -12,7 +12,7 @@ Many more strategies are coming soon!!
 Interface
 ===========
 
-https://6213c4aedd23a33f094dc4fa--admiring-ramanujan-511112.netlify.app/
+https://admiring-ramanujan-511112.netlify.app/
 
 Commands for using this strategy from near-cli
 ===========
