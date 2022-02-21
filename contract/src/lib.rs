@@ -166,6 +166,18 @@ impl Strategy {
 
         env::log(format!("SUCCESS! Harvesting Step 4 Complete").as_bytes());
     }
+
+    pub fn harvesting_step_5(&mut self) {
+        // Deposit to Farm
+        env::log(format!("SUCCESS! Deposit to Farm").as_bytes());
+        ext_self::deposit_to_farm(
+            &env::current_account_id(),
+            YOCTO_NEAR_0,
+            275_000_000_000_000,
+        );
+
+        env::log(format!("SUCCESS! Harvesting Step 5 Complete").as_bytes());
+    }
 }
 
 /*
